@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Shunk Pond – Fishing Game</title>
+<meta name="description" content="Shunk Pond: a cozy pixel-art fishing game. Catch over 67,000 fish, fill your aquarium, and gamble your catch.">
+<meta name="theme-color" content="#7a4b24">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='13' font-size='13'%3E%F0%9F%8E%A3%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -87,6 +90,21 @@ input[type=number]{font:inherit;width:110px;padding:6px;border:3px solid var(--w
 #fortRes{min-height:4.2em;margin:6px 0 10px}
 .up{color:#6fe05a}.down{color:#ff7a6b}
 .row.sel{background:#ffe9a8}
+/* modal + easter egg + polish */
+#modal{position:fixed;inset:0;z-index:30;background:rgba(6,14,26,.74);display:flex;align-items:center;justify-content:center;padding:14px}
+.mbox{background:var(--paper);border:5px solid var(--wood2);box-shadow:0 6px 0 #24130a;padding:16px 18px;max-width:440px;width:100%;max-height:90vh;overflow:auto;-webkit-user-select:text;user-select:text}
+.mbox.gold{background:linear-gradient(#fff6cf,#f3cd6b);border-color:#8a5a0a;box-shadow:0 0 40px 8px rgba(246,183,60,.7),0 6px 0 #24130a}
+.mbox h2{margin:0 0 8px}.mbox p{margin:0 0 8px}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+.mbox textarea{width:100%;min-height:90px;font:13px ui-monospace,monospace;border:3px solid var(--wood2);padding:6px;background:#fff}
+.chip.sac{background:#1c1c1c;color:#ffd25a;border-color:#ffd25a}.chip.sac.on{background:#4a3500}
+#stage.dev{box-shadow:0 0 0 4px #ffd25a,0 0 36px 10px rgba(246,183,60,.85);animation:devp 1.4s ease-in-out infinite}
+@keyframes devp{50%{box-shadow:0 0 0 4px #fff3b0,0 0 52px 18px rgba(246,183,60,.95)}}
+#stage.dev .pic:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 75%,rgba(255,215,90,.4),transparent 60%);mix-blend-mode:screen;pointer-events:none}
+#fi.gold{filter:sepia(1) saturate(8) hue-rotate(-12deg) brightness(1.25) drop-shadow(0 0 6px #ffd25a)}
+#stage{touch-action:none;-webkit-touch-callout:none}
+body{overscroll-behavior-y:contain}
+@media(prefers-reduced-motion:reduce){#stage.dev{animation:none}}
 /* slot machine */
 #mach{max-width:520px;margin:14px auto 4px;background:linear-gradient(#b0382e,#7c1f1a);border:6px solid #3a0f0c;box-shadow:0 6px 0 #1d0806,inset 0 0 0 4px #f6b73c;padding:16px 14px;color:#fff}
 .marq{display:flex;align-items:center;justify-content:center;gap:8px;background:#2a0a08;border:4px solid #f6b73c;padding:6px;margin-bottom:12px}
@@ -179,7 +197,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 <section id="v-fish"><div class="fgrid"><div class="fleft">
   <div id="stage">
     <div class="pic"><img id="scene" src="assets/idle.png" alt="A boy fishing from a wooden pier" draggable="false"><div id="tint"></div><div id="stars"></div><div id="mist"></div><div id="lamp"></div><div id="fx"></div></div>
-    <div id="status">Pick a bait and cast your line.</div>
+    <div id="status" aria-live="polite">Pick a bait and cast your line.</div>
     <div id="mini" hidden><div class="trk"><div id="zone"></div><span id="fi">🐟</span></div><div class="pg"><i id="bar"></i></div></div>
     <div id="card" hidden><div><span id="cBan" hidden></span><div class="big" id="cE"></div><h2 id="cN"></h2><p id="cI"></p><button id="cB">Keep fishing</button></div></div>
   </div>
@@ -208,6 +226,9 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
     <p class="muted" id="dexInfo"></p><div id="dexTiers"></div>
     <h2 style="margin-top:14px">Species found</h2><div class="dex" id="dex"></div>
     <h2 style="margin-top:14px">Latest discoveries</h2><div id="dexRecent"></div></div>
+  <div class="panel"><h2>Your game</h2><p class="muted" id="stats"></p>
+    <div class="ctl"><button id="expSave">Copy save code</button><button id="impSave">Load save code</button><button id="resetGame">Reset game</button></div>
+    <p class="muted" style="margin:8px 0 0">Progress is saved in this browser. Copy a save code to back it up or move to another device.</p></div>
 </section>
 
 <section id="v-fort" hidden>
@@ -217,7 +238,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
       <div class="marq"><span class="bulbs"></span><b>FORTUNE</b><span class="bulbs"></span></div>
       <div class="lcd"><canvas id="fortSpr" width="1" height="1"></canvas><div><b id="fortName">No fish selected</b><br><span id="fortInfo">Choose a fish from your bag below</span></div></div>
       <div class="win"><span class="x">x</span><div class="reel"><div class="strip"></div></div><span class="dot">.</span><div class="reel"><div class="strip"></div></div><div class="reel"><div class="strip"></div></div><span class="payline"></span>
-        <div class="lever" id="lever" role="button" aria-label="Pull the lever"><i class="rod"></i><i class="ball"></i></div></div>
+        <div class="lever" id="lever" role="button" tabindex="0" aria-label="Pull the lever"><i class="rod"></i><i class="ball"></i></div></div>
       <button id="spin" disabled>SPIN</button>
       <div class="tray" id="fortRes">Pick a fish, then spin.</div>
     </div>
@@ -247,7 +268,9 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
   </div>
 </section>
 </main>
-<div id="toast" hidden></div>
+<noscript><p style="color:#fff;padding:20px">Shunk Pond needs JavaScript. Please turn it on and reload.</p></noscript>
+<div id="modal" hidden><div class="mbox" role="dialog" aria-modal="true"><h2 id="mT"></h2><div id="mB"></div><div class="mbtns" id="mBtns"></div></div></div>
+<div id="toast" hidden role="status"></div>
 
 <script>
 const $=s=>document.querySelector(s),R=Math.random;
@@ -255,20 +278,22 @@ const rnd=()=>{try{return crypto.getRandomValues(new Uint32Array(1))[0]/42949672
 /* ---------- data ---------- */
 // adjectives: name, spawn weight, price multiplier  -> 8 x 14 species = 112 fish
 const ADJ=[["Pond",30,1],["River",24,1.3],["Silver",17,1.7],["Spotted",12,2.2],["Mossy",8,3],["Golden",5,4.5],["Crystal",3,7],["Mythic",1,14]];
-const RAR=["Common","Common","Uncommon","Uncommon","Rare","Epic","Legendary","Mythic"];
-const RC=["#7d8b7d","#7d8b7d","#3f9a2c","#3f9a2c","#2f78c8","#8a4fd0","#d98a1f","#d0392e"];
+const RAR=["Common","Common","Uncommon","Uncommon","Rare","Epic","Legendary","Mythic","Platinum"];
+const RC=["#7d8b7d","#7d8b7d","#3f9a2c","#3f9a2c","#2f78c8","#8a4fd0","#d98a1f","#d0392e","#6f8499"];
 // species: name, emoji, avg kg, shunk per kg
 const SP=[["Minnow","🐟",0.1,40],["Perch","🐠",0.6,25],["Carp","🐟",3,12],["Trout","🐟",1.5,22],["Catfish","🐡",5,10],["Bass","🐟",2,20],["Pike","🦈",4,8],["Eel","🐍",1.2,30],["Salmon","🐟",4.5,12],["Sturgeon","🐟",18,6],["Koi","🐠",2.5,25],["Tuna","🐟",25,5],["Swordfish","🦈",40,4],["Anglerfish","🐡",8,12],["Guppy","🐠",0.044,346.52],["Molly","🐠",0.136,170.52],["Tetra","🐠",0.124,130.33],["Betta","🐠",0.12,141.22],["Goby","🐠",0.03,223.36],["Blenny","🐠",0.128,110.75],["Killifish","🐠",0.112,83.23],["Stickleback","🐠",0.072,351.41],["Gudgeon","🐟",0.127,199.39],["Bleak","🐠",0.117,58.84],["Dace","🐠",0.065,121.81],["Smelt","🐠",0.033,589.88],["Anchovy","🐠",0.085,81.21],["Sardine","🐠",0.134,102.14],["Damselfish","🐠",0.078,201.24],["Clownfish","🐠",0.098,254.76],["Pipefish","🐟",0.099,207.91],["Roach","🐡",1.17,33.34],["Rudd","🐠",0.39,110.67],["Chub","🐟",0.43,126.03],["Loach","🐠",0.86,42.04],["Bluegill","🐡",0.94,61.03],["Sunfish","🐠",0.53,63.9],["Pumpkinseed","🐡",0.79,55.97],["Crappie","🐠",0.73,74.28],["Herring","🐟",0.48,108.3],["Shad","🐡",0.33,134.98],["Mullet","🐠",1.16,43.81],["Wrasse","🐡",0.62,40.86],["Tang","🐠",0.74,52.0],["Angelfish","🐠",1.03,39.25],["Discus","🐠",1.05,28.79],["Oscar","🐡",0.69,68.29],["Archerfish","🐟",0.53,105.26],["Mudskipper","🐠",1.17,44.82],["Sculpin","🐠",1.15,38.49],["Whitefish","🐠",0.63,39.84],["Cisco","🐟",0.43,129.24],["Grayling","🐟",0.3,137.93],["Pompano","🐟",0.85,29.71],["Tilapia","🐠",0.86,56.56],["Boxfish","🐡",0.9,48.54],["Piranha","🐟",0.3,149.75],["Bream","🐠",4.96,18.06],["Tench","🐡",4.6,19.33],["Barbel","🐡",2.5,26.67],["Walleye","🐟",5.44,11.31],["Zander","🐟",3.38,11.73],["Burbot","🐠",5.03,17.39],["Mackerel","🐟",3.78,14.35],["Bonito","🐟",3.84,10.97],["Snapper","🐟",5.81,9.37],["Cod","🐠",1.73,29.8],["Haddock","🐟",5.71,15.62],["Pollock","🐠",3.8,13.25],["Flounder","🐠",3.53,24.73],["Sole","🐟",5.77,11.4],["Plaice","🐠",2.19,28.53],["Turbot","🐟",4.31,13.59],["Parrotfish","🐠",4.55,7.43],["Pufferfish","🐡",1.65,42.71],["Lionfish","🐠",1.7,37.65],["Stonefish","🐡",3.53,21.86],["Scorpionfish","🐟",3.68,19.67],["Trevally","🐡",2.08,30.3],["Sweetlips","🐡",5.53,6.92],["Hake","🐠",5.3,10.21],["Ling","🐠",3.9,21.69],["Lamprey","🐍",2.87,17.9],["Bowfin","🐠",3.59,25.83],["Dorado","🐡",2.79,14.6],["Pacu","🐡",3.67,10.13],["Muskie","🐟",33.49,3.88],["Gar","🦈",15.4,9.12],["Grouper","🐟",28.66,3.46],["Halibut","🐟",38.76,2.45],["Skate","🦈",19.25,6.25],["Ray","🦈",11.51,10.55],["Barramundi","🐟",26.23,4.22],["Barracuda","🦈",11.25,7.77],["Amberjack","🦈",13.48,8.86],["Wahoo","🐟",31.12,2.62],["Sailfish","🐟",24.21,3.63],["Arapaima","🦈",17.31,5.32],["Opah","🦈",16.2,4.22],["Coelacanth","🐟",21.26,3.21],["Paddlefish","🐟",15.53,5.82],["Marlin","🐟",118.58,1.52],["Oarfish","🐍",81.5,2.03],["Mola","🐡",142.47,1.01],["Beluga","🦈",109.41,1.44],["Goliath","🐟",118.65,1.77]];
 const VAR=["Pond", "Muddy", "Little", "Plain", "Dusky", "Creek", "Reed", "Stubby", "Drab", "Pebble", "River", "Brook", "Swift", "Banded", "Lined", "Sandy", "Rusty", "Slender", "Hardy", "Cedar", "Silver", "Copper", "Steel", "Bronze", "Pearl", "Opal", "Ivory", "Jade", "Mirror", "Lantern", "Spotted", "Striped", "Leopard", "Tiger", "Zebra", "Marbled", "Painted", "Speckled", "Checkered", "Ribbon", "Mossy", "Thorned", "Ancient", "Giant", "Hooded", "Horned", "Bearded", "Armored", "Whiskered", "Sunken", "Golden", "Amber", "Solar", "Gilded", "Sunfire", "Royal", "Radiant", "Honeyed", "Saffron", "Blazing", "Crystal", "Frozen", "Starlit", "Moonlit", "Glass", "Prism", "Aurora", "Diamond", "Spirit", "Phantom", "Mythic", "Abyssal", "Celestial", "Eternal", "Void", "Dragon", "Titan", "Elder", "Cosmic", "Primal"];
-const MARKS=["Dawn","Noon","Dusk","Midnight","Pond","Bayou","Glacier","Cavern"],TIERN=["Common I","Common II","Uncommon I","Uncommon II","Rare","Epic","Legendary","Mythic"];
+const MARKS=["Dawn","Noon","Dusk","Midnight","Pond","Bayou","Glacier","Cavern"],TIERN=["Common I","Common II","Uncommon I","Uncommon II","Rare","Epic","Legendary","Mythic","Platinum"];
 const NSP=SP.length,NV=80,NM=8,TOTAL=NV*NSP*NM;
-const fi=id=>{const v=id/(NSP*NM)|0;return{v,s:(id/NM|0)%NSP,m:id%NM,a:v/10|0}};
+const KOI=SP.findIndex(x=>x[0]==="Koi"),DEV=TOTAL;   // DEV = the one and only Platinum fish, "Devanshu"
+const fi=id=>{if(id===DEV)return{v:80,s:KOI,m:0,a:8};const v=id/(NSP*NM)|0;return{v,s:(id/NM|0)%NSP,m:id%NM,a:v/10|0}};
 const BAITS=[
  {id:"worm",n:"Worm",e:"🪱",price:15,luck:0,size:1,d:"Plain and cheap."},
  {id:"cricket",n:"Cricket",e:"🦗",price:40,luck:.6,size:1.1,d:"Slightly better odds."},
  {id:"shrimp",n:"Shrimp",e:"🦐",price:90,luck:1.4,size:1.3,d:"Bigger fish bite."},
  {id:"glow",n:"Glow lure",e:"💡",price:200,luck:2.6,size:1.5,d:"Rare fish are drawn to it."},
- {id:"fly",n:"Golden fly",e:"✨",price:500,luck:5,size:1.8,d:"Best odds for legendary catches."}];
+ {id:"fly",n:"Golden fly",e:"✨",price:500,luck:5,size:1.8,d:"Best odds for legendary catches."},
+ {id:"sac",n:"Sacrificial bait",e:"🕯️",price:0,luck:0,size:1,special:1,d:"One use only."}];
 // lakes: tint filter, luck bonus, weight multiplier, favoured species indexes (3x more likely)
 const LAKES=[
  {id:"pond",n:"Greenwood Pond",cost:0,lf:"brightness(1)",luck:0,size:1,fav:[],d:"Calm and friendly. A bit of everything."},
@@ -299,7 +324,7 @@ function sceneChips(){
   $("#lakeChips").innerHTML='<span class="muted">Lake</span>'+LAKES.map(l=>`<button class="chip ${S.lake===l.id?"on":""}" data-lake="${l.id}">${S.lakes[l.id]?"":"🔒 "}${l.n}${S.lakes[l.id]?"":" ("+l.cost+")"}</button>`).join("");
   $("#timeChips").innerHTML='<span class="muted">Time</span>'+[["auto","Auto ("+T_().n+")"],...TIMES.map(t=>[t.id,t.n])].map(t=>`<button class="chip ${S.time===t[0]?"on":""}" data-time="${t[0]}">${t[1]}</button>`).join("");
 }
-const fname=id=>{const q=fi(id);return VAR[q.v]+" "+SP[q.s][0]+" ("+MARKS[q.m]+")"};
+const fname=id=>{if(id===DEV)return"Devanshu";const q=fi(id);return VAR[q.v]+" "+SP[q.s][0]+" ("+MARKS[q.m]+")"};
 const fem=id=>SP[fi(id).s][1];
 
 /* ---------- save ---------- */
@@ -312,11 +337,18 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
 function daily(){const d=new Date().toDateString();if(S.day!==d){S.day=d;S.baits.worm=(S.baits.worm||0)+2;save();toast("Daily gift: 2 free worms added to your bait box.")}}
 
+/* ---------- dialogs ---------- */
+function modal(title,html,btns,cls){const b=$("#mBtns");$("#mT").textContent=title;$("#mB").innerHTML=html;b.innerHTML="";$(".mbox").className="mbox "+(cls||"");
+  btns.forEach(x=>{const e=document.createElement("button");e.textContent=x[0];if(x[2])e.style.background="var(--gold)";e.onclick=()=>{$("#modal").hidden=true;if(x[1])x[1]()};b.appendChild(e)});
+  $("#modal").hidden=false;if(b.lastChild)b.lastChild.focus()}
+const ask=(t,h,ok,cb)=>modal(t,h,[["Cancel"],[ok,cb,1]]);
+function setView(v){view=v;document.querySelectorAll("main>section").forEach(s=>s.hidden=s.id!=="v-"+v);document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo(0,0);if(v==="aqua")aquaStart()}
+
 /* ---------- rendering ---------- */
 let view="fish";
 function rescue(){
   if(racing||(st!=="idle"))return;
-  const have=BAITS.reduce((a,b)=>a+(S.baits[b.id]||0),0),cheapest=Math.min(...BAITS.map(b=>b.price));
+  const have=BAITS.filter(b=>!b.special).reduce((a,b)=>a+(S.baits[b.id]||0),0),cheapest=Math.min(...BAITS.filter(b=>!b.special).map(b=>b.price));
   const worth=S.shunk+S.bag.reduce((a,f)=>a+f.p,0)+(S.aq||[]).reduce((a,f)=>a+f.p,0);
   if(have===0&&worth<cheapest){S.baits.worm=2;S.sel="worm";save();play("coin");toast("You were out of bait and shunk, so a kind old fisherman gave you 2 worms.")}
 }
@@ -325,18 +357,19 @@ function render(){
   $("#money").textContent=S.shunk.toLocaleString();
   $("#bagN").textContent=S.bag.length?"("+S.bag.length+")":"";
   sceneChips();
-  $("#baitChips").innerHTML=BAITS.map(b=>`<button class="chip ${S.sel===b.id?"on":""}" data-bait="${b.id}">${b.e} ${b.n} x${S.baits[b.id]||0}</button>`).join("");
-  $("#shopGrid").innerHTML=BAITS.map(b=>`<div class="item"><div class="e">${b.e}</div><b>${b.n}</b> <span class="muted">(owned ${S.baits[b.id]||0})</span><p class="muted">${b.d}</p><button data-buy="${b.id}:1" ${S.shunk<b.price?"disabled":""}>Buy 1 · ${b.price}</button> <button data-buy="${b.id}:5" ${S.shunk<b.price*5?"disabled":""}>Buy 5 · ${b.price*5}</button></div>`).join("");
-  const tot=S.bag.reduce((a,f)=>a+f.p,0);
+  $("#baitChips").innerHTML=BAITS.filter(b=>!b.special||S.baits[b.id]>0).map(b=>`<button class="chip ${S.sel===b.id?"on":""}${b.special?" sac":""}" data-bait="${b.id}">${b.e} ${b.n} x${S.baits[b.id]||0}</button>`).join("");
+  $("#shopGrid").innerHTML=BAITS.filter(b=>!b.special).map(b=>`<div class="item"><div class="e">${b.e}</div><b>${b.n}</b> <span class="muted">(owned ${S.baits[b.id]||0})</span><p class="muted">${b.d}</p><button data-buy="${b.id}:1" ${S.shunk<b.price?"disabled":""}>Buy 1 · ${b.price}</button> <button data-buy="${b.id}:5" ${S.shunk<b.price*5?"disabled":""}>Buy 5 · ${b.price*5}</button></div>`).join("");
+  const tot=S.bag.reduce((a,f)=>a+(f.id===DEV?0:f.p),0);
   $("#bagTot").textContent=S.bag.length?S.bag.length+" fish worth "+tot+" shunk":"";
   $("#sellAll").disabled=!S.bag.length;
-  $("#bagList").innerHTML=S.bag.length?S.bag.map((f,i)=>`<div class="row"><span style="font-size:26px">${fem(f.id)}</span><span class="n">${fname(f.id)} <span class="tag" style="background:${RC[fi(f.id).a]}">${RAR[fi(f.id).a]}</span><br><span class="muted">${f.w} kg</span></span><button data-sell="${i}">Sell · ${f.p}</button></div>`).join(""):'<p class="muted">Your bag is empty. Go catch something.</p>';
-  const cnt=new Array(NSP).fill(0),tc=new Array(8).fill(0);let n=0;
-  for(const k in S.dex){const q=fi(+k);cnt[q.s]++;tc[q.a]++;n++}
+  $("#bagList").innerHTML=S.bag.length?S.bag.map((f,i)=>`<div class="row"><span style="font-size:26px">${fem(f.id)}</span><span class="n">${fname(f.id)} <span class="tag" style="background:${RC[fi(f.id).a]}">${RAR[fi(f.id).a]}</span><br><span class="muted">${f.w} kg</span></span><button data-sell="${i}">Sell · ${f.p.toLocaleString()}</button></div>`).join(""):'<p class="muted">Your bag is empty. Go catch something.</p>';
+  const cnt=new Array(NSP).fill(0),tc=new Array(9).fill(0);let n=0;
+  for(const k in S.dex){if(+k===DEV){tc[8]++;continue}const q=fi(+k);cnt[q.s]++;tc[q.a]++;n++}
   const per=NV/8*NSP*NM;
   $("#dexN").textContent=n.toLocaleString()+" of "+TOTAL.toLocaleString();
   $("#dexInfo").textContent="Every fish is a variant + a species + a strain, so there are "+TOTAL.toLocaleString()+" different fish to discover. Strains depend on when and where you catch: Dawn, Noon, Dusk and Midnight follow the time of day, and Pond, Bayou, Glacier and Cavern follow the lake.";
-  $("#dexTiers").innerHTML=TIERN.map((t,i)=>`<div class="row"><span class="tag" style="background:${RC[i]};min-width:100px;text-align:center">${t}</span><span class="n"><span class="bar"><i style="width:${Math.max(tc[i]?1:0,tc[i]/per*100)}%"></i></span></span><span class="muted">${tc[i].toLocaleString()} / ${per.toLocaleString()}</span></div>`).join("");
+  $("#dexTiers").innerHTML=TIERN.map((t,i)=>{const tot=i<8?per:1;return `<div class="row"><span class="tag" style="background:${RC[i]};min-width:100px;text-align:center">${t}</span><span class="n"><span class="bar"><i style="width:${Math.max(tc[i]?1:0,tc[i]/tot*100)}%${i===8?";background:#ffd25a":""}"></i></span></span><span class="muted">${tc[i].toLocaleString()} / ${tot.toLocaleString()}</span></div>`}).join("")+(S.devo?"":`<p class="muted" style="margin:6px 0 0">Platinum: one of one. Finish the Mythic tier to learn its secret.</p>`);
+  $("#stats").textContent="Fish caught: "+S.caught.toLocaleString()+". Different fish discovered: "+n.toLocaleString()+".";
   $("#dex").innerHTML=SP.map((s,i)=>`<span title="${s[0]}: ${cnt[i]} of ${NV*NM} found" style="${cnt[i]?"background:#fff6dc;border-color:#3f9a2c":""}">${cnt[i]?s[1]:"?"}</span>`).join("");
   $("#dexRecent").innerHTML=(S.recent||[]).length?S.recent.map(id=>`<div class="row"><span style="font-size:22px">${fem(id)}</span><span class="n">${fname(id)}</span><span class="tag" style="background:${RC[fi(id).a]}">${RAR[fi(id).a]}</span></div>`).join(""):'<p class="muted">Nothing yet. Go fishing!</p>';
   raceTally();fortRender();aquaRender();
@@ -344,22 +377,31 @@ function render(){
 }
 document.addEventListener("click",e=>{
   const t=e.target.closest("[data-bait],[data-buy],[data-sell],[data-v],[data-lake],[data-time],[data-fort],[data-aqadd],[data-aqout]");if(!t)return;
-  if(t.dataset.v){view=t.dataset.v;document.querySelectorAll("main>section").forEach(s=>s.hidden=s.id!=="v-"+view);document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b===t));if(view==="aqua")aquaStart();return}
+  if(t.dataset.v){setView(t.dataset.v);return}
   if(t.dataset.lake||t.dataset.time){
     if(!(st==="idle"||st==="done"))return toast("Finish this cast first.");
     if(t.dataset.time){S.time=t.dataset.time}
     else{const L=LAKES.find(x=>x.id===t.dataset.lake);
-      if(!S.lakes[L.id]){if(S.shunk<L.cost)return toast("Unlocking "+L.n+" costs "+L.cost+" shunk.");if(!confirm("Unlock "+L.n+" for "+L.cost+" shunk?"))return;S.shunk-=L.cost;S.lakes[L.id]=1;play("coin");toast("Unlocked "+L.n+"!")}
+      if(!S.lakes[L.id]){if(S.shunk<L.cost)return toast("Unlocking "+L.n+" costs "+L.cost.toLocaleString()+" shunk.");
+        return ask("Unlock "+L.n+"?","<p>"+L.d+"</p><p>Costs <b>"+L.cost.toLocaleString()+" shunk</b>.</p>","Unlock",()=>{if(S.shunk<L.cost)return;S.shunk-=L.cost;S.lakes[L.id]=1;S.lake=L.id;play("coin");toast("Unlocked "+L.n+"!");save();render();applyScene()})}
       S.lake=L.id}
     save();render();applyScene();return}
-  if(t.dataset.fort){if(spinning)return;fobj=S.bag[+t.dataset.fort];$("#fortRes").textContent="Ready. Pull the lever or press SPIN.";render();return}
+  if(t.dataset.fort){if(spinning||!S.bag[+t.dataset.fort]||S.bag[+t.dataset.fort].id===DEV)return;fobj=S.bag[+t.dataset.fort];$("#fortRes").textContent="Ready. Pull the lever or press SPIN.";render();return}
   if(t.dataset.aqadd){const f=S.bag[+t.dataset.aqadd];if(!f)return;if(S.aq.length>=5)return toast("The aquarium is full (5 fish). Put one back in your bag first.");S.bag.splice(+t.dataset.aqadd,1);S.aq.push(f);save();render();toast(fname(f.id)+" is now swimming in your aquarium.");return}
   if(t.dataset.aqout){const f=S.aq[+t.dataset.aqout];if(!f)return;S.aq.splice(+t.dataset.aqout,1);S.bag.push(f);save();render();toast("Back in your bag.");return}
   if(t.dataset.bait){if(st==="idle"||st==="done"){S.sel=t.dataset.bait;save();render()}return}
   if(t.dataset.buy){const[id,n]=t.dataset.buy.split(":"),b=BAITS.find(x=>x.id===id),c=b.price*n;if(S.shunk<c)return;S.shunk-=c;S.baits[id]=(S.baits[id]||0)+ +n;play("coin");save();render();toast("Bought "+n+" "+b.n+(n>1?"s":""));return}
-  if(t.dataset.sell){const f=S.bag.splice(+t.dataset.sell,1)[0];S.shunk+=f.p;play("coin");save();render();toast("Sold "+fname(f.id)+" for "+f.p+" shunk")}
+  if(t.dataset.sell){const f=S.bag[+t.dataset.sell];if(!f)return;
+    const go=()=>{const j=S.bag.indexOf(f);if(j<0)return;S.bag.splice(j,1);S.shunk+=f.p;play("coin");save();render();toast("Sold "+fname(f.id)+" for "+f.p.toLocaleString()+" shunk")};
+    if(f.id===DEV)ask("Sell Devanshu?","<p>He is <b>one of one</b> and will never bite again. You would get <b>25,000 shunk</b>.</p><p class='muted'>You can keep him in your aquarium instead.</p>","Sell for 25,000",go);else go()}
 });
-$("#sellAll").onclick=()=>{const t=S.bag.reduce((a,f)=>a+f.p,0);S.shunk+=t;S.bag=[];play("coin");save();render();toast("Sold everything for "+t+" shunk")};
+$("#sellAll").onclick=()=>{
+  const keep=S.bag.filter(f=>f.id===DEV),sell=S.bag.filter(f=>f.id!==DEV);
+  if(!sell.length)return toast("Devanshu stays safe in your bag. Sell him on his own row if you really want to.");
+  const go=()=>{const t=sell.reduce((a,f)=>a+f.p,0);S.shunk+=t;S.bag=keep;play("coin");save();render();toast("Sold everything for "+t.toLocaleString()+" shunk")};
+  const rare=sell.filter(f=>fi(f.id).a>=5).length;
+  rare?ask("Sell everything?","<p>Your bag has <b>"+rare+"</b> Epic or better fish in it.</p>","Sell all",go):go();
+};
 
 /* ---------- sound (synthesised, no files needed) ---------- */
 let AC;
@@ -372,6 +414,8 @@ const SFX={
  hook:(c,t)=>{tone(c,t,300,900,.12,"square",.1)},
  catch:(c,t)=>{[523,659,784,1047].forEach((f,i)=>tone(c,t+i*.09,f,f,.22,"triangle",.2));noise(c,t,.3,800,3000,.15)},
  big:(c,t)=>{SFX.catch(c,t);[1047,1319,1568,2093].forEach((f,i)=>tone(c,t+.4+i*.08,f,f,.3,"triangle",.17))},
+ gong:(c,t)=>{tone(c,t,140,70,1.4,"sine",.3);tone(c,t,280,140,1.1,"triangle",.12);noise(c,t,.4,300,900,.12)},
+ golden:(c,t)=>{SFX.record(c,t);[1568,2093,2637,3136].forEach((f,i)=>tone(c,t+.9+i*.1,f,f,.5,"triangle",.14))},
  stop:(c,t)=>{tone(c,t,220,110,.1,"square",.12)},
  tick:(c,t)=>{tone(c,t,1400,1000,.04,"square",.05)},
  record:(c,t)=>{[523,659,784,1047,1319,1568].forEach((f,i)=>{tone(c,t+i*.08,f,f,.3,"triangle",.2);tone(c,t+i*.08,f/2,f/2,.3,"square",.04)});[2093,2637,3136].forEach((f,i)=>tone(c,t+.55+i*.07,f,f,.35,"sine",.1));noise(c,t+.5,.5,2500,6000,.1)},
@@ -398,71 +442,110 @@ function roll(b){
   return{id:(v*NSP+s)*NM+m,w,p:Math.max(1,Math.round(w*SP[s][3]*ADJ[a][2]))};
 }
 function act(){
-  if(view!=="fish")return;
+  if(view!=="fish"||!$("#modal").hidden)return;
   if(st==="idle"){
-    const b=BAITS.find(x=>x.id===S.sel);
+    const b=BAITS.find(x=>x.id===S.sel)||BAITS[0];
     if(!S.baits[b.id]){toast("Out of "+b.n+". Choose another bait or visit the shop.");return}
-    S.baits[b.id]--;used=b;play("cast");save();render();st="wait";lab();img("idle");say("Line is out. Wait for a nibble…");
-    tm=setTimeout(bite,(2500+R()*5500)*T_().wait);
+    if(b.special)return ask("Use the Sacrificial Bait?","<p>A golden legend named <b>Devanshu</b> will take this bait.</p><p>Catch him and he is yours forever: worth <b>25,000 shunk</b>, one of a kind.</p><p><b>If he gets away, ALL your Mythic progress resets to 0.</b> Do not close or reload the page during the fight.</p>","Sacrifice it",()=>castNow(b));
+    castNow(b);
   }else if(st==="wait"){say("Wait for the bite…")}
   else if(st==="bite"){clearTimeout(tm);startReel()}
   else if(st==="reel")hold=true;
   else if(st==="done")toast("Press Keep fishing on the catch card to continue.");
 }
+function castNow(b){
+  if(st!=="idle")return;
+  S.baits[b.id]--;used=b;st="wait";play("cast");
+  if(b.special){S.sacActive=true;S.sel="worm";$("#stage").classList.add("dev")}
+  save();render();lab();img("idle");say(b.special?"The sacrifice sinks into the dark water…":"Line is out. Wait for a nibble…");
+  tm=setTimeout(bite,b.special?3500+R()*2500:(2500+R()*5500)*T_().wait);
+}
 const rel=()=>hold=false;
-function bite(){cur=roll(used);st="bite";play("bite");lab();img("bite");say("Something bit! Hook it now!");tm=setTimeout(()=>lose("Too slow. It spat out the bait."),1900)}
-function lose(m){play("lose");cancelAnimationFrame(rf);hold=false;st="idle";$("#mini").hidden=true;img("idle");say(m);render()}
+function bite(){
+  const dev=used&&used.special;
+  if(dev){if(document.hidden){tm=setTimeout(bite,1000);return}if(view!=="fish")setView("fish")}
+  cur=dev?{id:DEV,w:25,p:25000}:roll(used);st="bite";play(dev?"gong":"bite");lab();img("bite");
+  say(dev?"A golden shape rises from the deep! Hook it NOW!":"Something bit! Hook it now!");
+  tm=setTimeout(()=>lose("Too slow. It spat out the bait."),dev?3000:1900)}
+function lose(m){
+  if(S.sacActive&&cur&&cur.id===DEV)return devFail();
+  play("lose");cancelAnimationFrame(rf);hold=false;st="idle";$("#mini").hidden=true;img("idle");say(m);render()}
+function devFail(abandoned){
+  cancelAnimationFrame(rf);clearTimeout(tm);hold=false;st="idle";$("#mini").hidden=true;$("#stage").classList.remove("dev");$("#fi").className="";
+  let n=0;for(const k in S.dex){if(+k!==DEV&&fi(+k).a===7){delete S.dex[k];n++}}
+  S.recent=(S.recent||[]).filter(id=>id===DEV||fi(id).a!==7);
+  S.sacActive=false;S.sacGiven=false;S.baits.sac=0;S.devFails=(S.devFails||0)+1;
+  img("idle");say("Devanshu vanished into the deep…");play("lose");save();render();
+  modal(abandoned?"You left the fight":"Devanshu got away","<p>"+(abandoned?"You left while Devanshu was on the line.":"The golden fish slipped back into the dark water.")+"</p><p><b>Your Mythic progress has been reset to 0</b> ("+n.toLocaleString()+" fish forgotten).</p><p class='muted'>Complete the Mythic tier again to earn another chance.</p>",[["Continue",null,1]]);
+}
+const EGG_NEED=NV/8*NSP*NM;
+function mythicCount(){let n=0;for(const k in S.dex)if(+k!==DEV&&fi(+k).a===7)n++;return n}
+function eggCheck(){
+  if(S.devo||S.sacGiven||S.sacActive||(S.baits.sac||0)>0)return;
+  if(mythicCount()<EGG_NEED)return;
+  S.baits.sac=1;S.sacGiven=true;S.sel="sac";save();render();play("golden");
+  modal("The water goes still…","<p>You have caught <b>every one of the "+EGG_NEED.toLocaleString()+" Mythic fish</b>.</p><p>Something ancient has noticed you, and leaves a single <b>Sacrificial Bait</b> on your line.</p><p>Use it, and a legend will bite. Catch him and he is yours. Fail, and your Mythic progress is gone.</p><p class='muted'>You only get one.</p>",[["I understand",null,1]],"gold");
+}
+window.__eggTest=()=>{for(let v=70;v<80;v++)for(let s=0;s<NSP;s++)for(let m=0;m<NM;m++)S.dex[(v*NSP+s)*NM+m]=1;save();render();eggCheck()};   // tester shortcut: marks every Mythic fish as caught
 function reelInit(c){
+  if(c.id===DEV)return{d:1,zs:.11,y:.3,v:0,f:.5,tg:.5,t:1,p:30,age:0,jr:.5,ap:4.5,ls:18,gn:26};   // hard on purpose, but a focused player can win
   const a=fi(c.id).a,d=Math.min(1,.1+a*.1+Math.min(c.w/60,.2));
   const ease=1+Math.min(.5,(S.fails||0)*.12)+(S.caught<3?.3:0);
-  return{d,zs:Math.min(.55,(.32-d*.20)*ease),y:.3,v:0,f:.5,tg:.5,t:1,p:40,age:0};
+  return{d,zs:Math.min(.55,(.32-d*.20)*ease),y:.3,v:0,f:.5,tg:.5,t:1,p:40,age:0,jr:.26+d*.40,ap:1.5+d*2.8,ls:6+d*13,gn:26};
 }
 function reelStep(r,dt,hold){
   r.age+=dt;
   r.v+=(hold?4.5:-3.5)*dt;r.v*=Math.pow(.9,dt*60);r.y+=r.v*dt;
   const mx=1-r.zs;if(r.y<0){r.y=0;r.v=0}if(r.y>mx){r.y=mx;r.v=0}
-  r.t-=dt;if(r.t<=0){const sp=.26+r.d*.40;r.tg=Math.max(.05,Math.min(.95,r.f+(Math.random()-.5)*2*sp));r.t=1+Math.random()*(1.4-r.d*.6)}
-  r.f+=(r.tg-r.f)*Math.min(1,dt*(1.5+r.d*2.8));
+  r.t-=dt;if(r.t<=0){const sp=r.jr;r.tg=Math.max(.05,Math.min(.95,r.f+(Math.random()-.5)*2*sp));r.t=1+Math.random()*(1.4-r.d*.6)}
+  r.f+=(r.tg-r.f)*Math.min(1,dt*r.ap);
   const on=r.f>r.y&&r.f<r.y+r.zs;
-  r.p+=on?26*dt:-(r.age<1.5?0:6+r.d*13)*dt;
+  r.p+=on?r.gn*dt:-(r.age<1.5?0:r.ls)*dt;
   return r.p>=100?"win":r.p<=0?"lose":null;
 }
 function startReel(){
   st="reel";play("hook");lab();$("#mini").hidden=false;hold=true;say("Hold to raise the green zone. Keep the fish inside it!");
-  const r=reelInit(cur);$("#fi").textContent=fem(cur.id);$("#zone").style.height=r.zs*100+"%";let last=performance.now();
+  const r=reelInit(cur);$("#fi").textContent=fem(cur.id);$("#fi").className=cur.id===DEV?"gold":"";if(cur.id===DEV)say("Devanshu fights back! Keep him in the zone!");$("#zone").style.height=r.zs*100+"%";let last=performance.now();
   const loop=n=>{
     const dt=Math.min(.05,(n-last)/1000);last=n;const res=reelStep(r,dt,hold);
     $("#zone").style.bottom=r.y*100+"%";$("#fi").style.bottom="calc("+r.f*100+"% - 12px)";$("#bar").style.height=Math.max(0,Math.min(100,r.p))+"%";
     if(res==="win")return win();
-    if(res==="lose"){S.fails=(S.fails||0)+1;save();return lose("It broke free. The green zone will be a bit bigger next time.")}
+    if(res==="lose"){if(cur.id!==DEV){S.fails=(S.fails||0)+1;save()}return lose("It broke free. The green zone will be a bit bigger next time.")}
     rf=requestAnimationFrame(loop)};
   rf=requestAnimationFrame(loop);
 }
 function burst(n,cols){if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;const g=$("#stage");for(let i=0;i<n;i++){const e=document.createElement("i"),ang=R()*Math.PI*2,d=70+R()*150;e.className="cf";e.style.background=cols[i%cols.length];e.style.setProperty("--x",Math.cos(ang)*d+"px");e.style.setProperty("--y",Math.sin(ang)*d-60+"px");e.style.setProperty("--r",(R()*360|0)+"deg");e.style.animationDelay=R()*.15+"s";g.appendChild(e);setTimeout(()=>e.remove(),1900)}}
 function win(){
-  hold=false;st="done";$("#mini").hidden=true;lab();img("catch");
+  hold=false;st="done";$("#mini").hidden=true;lab();img("catch");const isDev=cur.id===DEV;
+  if(isDev){S.devo=true;S.sacActive=false;$("#stage").classList.remove("dev");$("#fi").className=""}
   S.bag.push(cur);S.caught++;S.fails=0;const a=fi(cur.id).a;
   const prev=S.dex[cur.id],nw=!prev,rec=!nw&&cur.w>prev,top=S.top>0&&cur.w>S.top;
-  if(nw||rec)S.dex[cur.id]=cur.w;if(nw)S.recent=[cur.id,...(S.recent||[])].slice(0,8);if(cur.w>(S.top||0))S.top=cur.w;
-  const ban=top?["Heaviest catch ever!","#ff8a6b"]:rec?["New record weight!","#f6b73c"]:nw?["New fish in your dex!","#8fe070"]:null;
-  play(ban?"record":a>=5?"big":"catch");save();render();
+  if(nw||rec)S.dex[cur.id]=cur.w;if(nw)S.recent=[cur.id,...(S.recent||[])].slice(0,8);if(cur.w>(S.top||0)&&!isDev)S.top=cur.w;
+  let ban=top?["Heaviest catch ever!","#ff8a6b"]:rec?["New record weight!","#f6b73c"]:nw?["New fish in your dex!","#8fe070"]:null;
+  if(isDev)ban=["PLATINUM  ·  1 OF 1","#fff3b0"];
+  play(isDev?"golden":ban?"record":a>=5?"big":"catch");save();render();
   let extra="";
   if(rec)extra=`<br>+${(cur.w-prev).toFixed(2)} kg over your old best of ${prev} kg`;
   else if(nw)extra="<br>First one you've caught";
-  if(top)extra+="<br>The biggest fish you've ever landed";
-  $("#cE").textContent=fem(cur.id);$("#cN").textContent=fname(cur.id);
-  $("#cI").innerHTML=`<span class="tag" style="background:${RC[a]}">${RAR[a]}</span><br>${cur.w} kg · worth ${cur.p} shunk${extra}`;
+  if(top&&!isDev)extra+="<br>The biggest fish you've ever landed";
+  if(isDev)extra="<br><b>The one and only. He will never bite again.</b><br>He cannot be gambled. Sell him once, or keep him in your aquarium.";
+  if(isDev){const fr=spriteFor(cur).frames[1],c=document.createElement("canvas");c.width=fr.width;c.height=fr.height;c.getContext("2d").drawImage(fr,0,0);c.style.cssText="height:72px;image-rendering:pixelated";$("#cE").textContent="";$("#cE").appendChild(c)}else $("#cE").textContent=fem(cur.id);
+  $("#cN").textContent=fname(cur.id);
+  $("#cI").innerHTML=`<span class="tag" style="background:${RC[a]}">${RAR[a]}</span><br>${cur.w} kg · worth ${cur.p.toLocaleString()} shunk${extra}`;
   const bn=$("#cBan");bn.hidden=!ban;if(ban){bn.textContent=ban[0];bn.style.background=ban[1]}
   $("#card>div").classList.toggle("rec",!!ban);
   $("#card").hidden=false;{const cb=$("#cB");cb.disabled=true;setTimeout(()=>cb.disabled=false,900)}say(ban?ban[0]+" "+fname(cur.id)+", "+cur.w+" kg":"You caught a "+fname(cur.id)+"!");
-  if(ban||a>=6)burst(ban?40:24,["#f6b73c","#fff3b0","#ff8a6b","#8fe070","#6bc4ff"]);
+  if(ban||a>=6)burst(isDev?90:ban?40:24,isDev?["#ffd25a","#fff3b0","#ffffff","#f6b73c"]:["#f6b73c","#fff3b0","#ff8a6b","#8fe070","#6bc4ff"]);
+  if(!isDev)eggCheck();
 }
 function closeCard(){$("#card").hidden=true;if(st==="done"){st="idle";img("idle");say("Pick a bait and cast your line.");lab()}}
 $("#cB").onclick=e=>{e.stopPropagation();closeCard()};
 $("#card").onpointerdown=e=>e.stopPropagation();
 const A=$("#act");A.onpointerdown=e=>{e.preventDefault();act()};["pointerup","pointerleave","pointercancel"].forEach(ev=>A.addEventListener(ev,rel));
 const G=$("#stage");G.onpointerdown=()=>{if(st!=="done")act()};["pointerup","pointerleave","pointercancel"].forEach(ev=>G.addEventListener(ev,rel));
-addEventListener("keydown",e=>{if(e.code==="Space"&&view==="fish"&&!/INPUT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();if(!e.repeat)act()}});
+addEventListener("blur",()=>rel());document.addEventListener("visibilitychange",()=>{if(document.hidden)rel()});
+G.addEventListener("contextmenu",e=>e.preventDefault());A.addEventListener("contextmenu",e=>e.preventDefault());
+addEventListener("keydown",e=>{if(e.code==="Space"&&view==="fish"&&$("#modal").hidden&&!/INPUT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();if(!e.repeat)act()}});
 addEventListener("keyup",e=>{if(e.code==="Space"){e.preventDefault();rel()}});
 
 /* ---------- seahorse races ---------- */
@@ -521,8 +604,8 @@ function makeSprite(f){
   let L=Math.max(13,Math.min(46,Math.round(13+Math.sqrt(f.w)*6)));if(ty===2)L=Math.round(L*1.35);
   const Hh=Math.max(4,Math.round(L*[.34,.56,.17,.3][ty])),tw=Math.max(3,Math.round(L*.26)),fh=Math.max(2,Math.round(Hh*.42)),bill=BILL[nm]?Math.round(L*.3):0;
   const W=L+tw+bill+2,Ht=Hh+fh*2+8,cy=Math.round(Ht/2);
-  const vi=q.v%10,hue=a===5?30+vi*3:a===6?170+vi*12:a===7?280+vi*8:hs(q.v*7919+3)%360;
-  const sat=[28,36,14,58,44,92,82,92][a],lig=[42,48,72,52,40,56,66,62][a];
+  const vi=q.v%10,hue=a===8?46:a===5?30+vi*3:a===6?170+vi*12:a===7?280+vi*8:hs(q.v*7919+3)%360;
+  const sat=[28,36,14,58,44,92,82,92,100][a],lig=[42,48,72,52,40,56,66,62,58][a];
   const col=`hsl(${hue} ${sat}% ${lig}%)`,bel=`hsl(${hue} ${Math.max(10,sat-10)}% ${Math.min(92,lig+26)}%)`,fin=`hsl(${(hue+q.m*18)%360} ${Math.min(95,sat+14)}% ${Math.max(24,lig-10)}%)`,out=`hsl(${hue} ${Math.min(55,sat)}% 13%)`;
   const pat=a===3?q.v%3:-1,bl=L-1,frames=[];
   const hh=t=>ty===3?(Hh/2)*Math.sqrt(Math.max(0,1-Math.pow(2*t-1,2)))+.5:(Hh/2)*Math.pow(Math.sin(Math.PI*(.1+.8*Math.pow(t,.8))),.75);
@@ -536,6 +619,7 @@ function makeSprite(f){
         if(pat===0&&y<h2*.4&&hs(i*31+y*17+q.v)%6===0)cl=fin;
         if(pat===1&&i%4===1&&y<h2*.5)cl=fin;
         if(pat===2&&y===0&&i>2)cl=fin;
+        if(a===8&&(i*2+y)%5===0)cl="#fff6c8";
         put(tw+i,cy+y+sh,cl)}}
     for(let k=0;k<tw;k++){const half=Math.round(Hh*.5*(1.15-.95*k/tw)+.5),sh=Math.round(Math.sin(ph)*(1-k/tw)*Hh*.5);
       for(let y=-half;y<=half;y++)put(k,cy+y+sh,fin)}
@@ -560,7 +644,7 @@ function aquaSync(){
   for(let i=AQ.length-1;i>=0;i--)if(!S.aq.includes(AQ[i].f)){if(aqSel===AQ[i])aqSel=null;AQ.splice(i,1)}
   S.aq.forEach(f=>{if(AQ.some(a=>a.f===f))return;
     const sp=spriteFor(f),q=fi(f.id),face=R()<.5?1:-1;
-    const a={f,sp,L:sp.L,bt:BT[SP[q.s][0]]||0,x:AB.x0+30+R()*(AB.x1-AB.x0-60),y:AB.y0+20+R()*(AB.y1-AB.y0-40),vx:0,vy:0,sx:face,face,ph:R()*4,t:0,bob:R()*6,pause:R()*1.5,speed:Math.max(18,Math.min(52,60-sp.L*.9)),nb:4+R()*8,aura:q.a>=6?(q.a===7?300:190)+(q.v%10)*8:null};
+    const a={f,sp,L:sp.L,bt:BT[SP[q.s][0]]||0,x:AB.x0+30+R()*(AB.x1-AB.x0-60),y:AB.y0+20+R()*(AB.y1-AB.y0-40),vx:0,vy:0,sx:face,face,ph:R()*4,t:0,bob:R()*6,pause:R()*1.5,speed:Math.max(18,Math.min(52,60-sp.L*.9)),nb:4+R()*8,aura:q.a===8?48:q.a>=6?(q.a===7?300:190)+(q.v%10)*8:null};
     pickTarget(a);AQ.push(a)});
 }
 function bubble(x,y){BUB.push({x,y,v:9+R()*10,w:R()*6,r:R()<.3?2:1})}
@@ -633,7 +717,7 @@ function reelTo(i,d,dur){const s=strips[i],cur=+s.dataset.cur||0;
 [1,0,0].forEach((d,i)=>reelSet(i,d));
 function fortRender(){
   if(fobj&&!S.bag.includes(fobj))fobj=null;
-  $("#fortList").innerHTML=S.bag.length?S.bag.map((f,i)=>{const q=fi(f.id);return `<div class="row ${f===fobj?"sel":""}"><span style="font-size:26px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))} <span class="tag" style="background:${RC[q.a]}">${RAR[q.a]}</span><br><span class="muted">${f.w} kg, worth ${f.p} shunk</span></span><button data-fort="${i}" ${spinning?"disabled":""}>${f===fobj?"Selected":"Choose"}</button></div>`}).join(""):'<p class="muted">Your bag is empty. Catch a fish first.</p>';
+  $("#fortList").innerHTML=S.bag.length?S.bag.map((f,i)=>{const q=fi(f.id);return `<div class="row ${f===fobj?"sel":""}"><span style="font-size:26px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))} <span class="tag" style="background:${RC[q.a]}">${RAR[q.a]}</span><br><span class="muted">${f.w} kg, worth ${f.p.toLocaleString()} shunk</span></span>${f.id===DEV?'<button disabled>No gambling</button>':`<button data-fort="${i}" ${spinning?"disabled":""}>${f===fobj?"Selected":"Choose"}</button>`}</div>`}).join(""):'<p class="muted">Your bag is empty. Catch a fish first.</p>';
   $("#spin").disabled=!fobj||spinning;
   const key=fobj?fobj.id+"|"+fobj.w+"|"+fobj.p:"";
   if(key!==fortKey){fortKey=key;const c=$("#fortSpr"),x=c.getContext("2d");
@@ -641,7 +725,7 @@ function fortRender(){
     else{c.width=1;c.height=1;$("#fortName").textContent="No fish selected";$("#fortInfo").textContent="Choose a fish from your bag below"}}
 }
 function spin(){
-  if(spinning||!fobj)return;spinning=true;
+  if(spinning||!fobj||fobj.id===DEV)return;spinning=true;
   const mach=$("#mach"),lever=$("#lever");mach.classList.remove("win","lose");mach.classList.add("spinning");lever.classList.add("pull");setTimeout(()=>lever.classList.remove("pull"),700);
   const f=fobj,ow=f.w,op=f.p,c=50+Math.floor(rnd()*101),m=c/100;   // uniform: 0.50 ... 1.50, average exactly 1.00
   const dg=[Math.floor(c/100),Math.floor(c/10)%10,c%10],dur=[1.5,2.1,2.7];
@@ -658,10 +742,17 @@ function spin(){
     play(m>=1.35?"record":m>=1.1?"catch":m<=.75?"lose":"coin");
     spinning=false;save();render()},2900);
 }
-$("#spin").onclick=spin;$("#lever").onclick=spin;
+$("#spin").onclick=spin;$("#lever").onclick=spin;$("#lever").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();spin()}});
+
+/* ---------- save code / reset ---------- */
+function showCode(code){modal("Your save code",'<p class="muted">Copy all of this text and keep it somewhere safe.</p><textarea readonly id="codeBox"></textarea>',[["Close",null,1]]);$("#codeBox").value=code;$("#codeBox").select()}
+$("#expSave").onclick=()=>{const code=btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(()=>toast("Save code copied. Keep it somewhere safe."),()=>showCode(code));else showCode(code)};
+$("#impSave").onclick=()=>modal("Load a save code",'<p class="muted">Paste a save code below. It replaces your current progress.</p><textarea id="codeIn"></textarea>',[["Cancel"],["Load",()=>{try{const o=JSON.parse(decodeURIComponent(escape(atob($("#codeIn").value.trim()))));if(!o||typeof o!=="object"||typeof o.shunk!=="number")throw 0;localStorage.setItem(KEY,JSON.stringify(o));location.reload()}catch(e){toast("That save code is not valid.")}},1]]);
+$("#resetGame").onclick=()=>ask("Reset the whole game?","<p>This deletes all your fish, shunk, baits and progress. It cannot be undone.</p>","Reset everything",()=>{try{localStorage.removeItem(KEY)}catch(e){}location.reload()});
 
 /* ---------- start ---------- */
-muteLab();daily();setInterval(()=>{daily();if(S.time==="auto"&&st!=="wait"&&st!=="reel")applyScene();render()},60000);render();applyScene();
+muteLab();daily();setInterval(()=>{daily();if(S.time==="auto"&&st!=="wait"&&st!=="reel")applyScene();render()},60000);render();applyScene();if(S.sacActive)devFail(true);
 </script>
 </body>
 </html>
