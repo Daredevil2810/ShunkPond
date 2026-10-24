@@ -29,7 +29,7 @@ main{max-width:980px;margin:14px auto;padding:0 10px 40px}
 h2{margin:0 0 8px;font-size:21px}
 .muted{opacity:.7;font-size:15px}
 #stage{position:relative;border:5px solid var(--wood2);box-shadow:0 5px 0 #24130a;background:#000;touch-action:manipulation;cursor:pointer}
-#scene{display:block;width:100%;aspect-ratio:3/2;image-rendering:pixelated;object-fit:cover}
+#scene{display:block;width:100%;aspect-ratio:var(--ar,1.5);image-rendering:auto;object-fit:cover}
 .pic{position:relative;overflow:hidden;line-height:0}
 .pic>div{position:absolute;pointer-events:none}
 #scene{filter:var(--lf,brightness(1)) var(--tf,brightness(1));transition:filter .8s}
@@ -37,17 +37,26 @@ h2{margin:0 0 8px;font-size:21px}
 #stars{left:0;right:0;top:0;height:42%;opacity:0;transition:opacity .8s;background:radial-gradient(1.5px 1.5px at 8% 10%,#fff,transparent),radial-gradient(1.5px 1.5px at 22% 24%,#fff,transparent),radial-gradient(2px 2px at 35% 8%,#fff,transparent),radial-gradient(1.5px 1.5px at 48% 30%,#fff,transparent),radial-gradient(1.5px 1.5px at 60% 12%,#fff,transparent),radial-gradient(2px 2px at 72% 26%,#fff,transparent),radial-gradient(1.5px 1.5px at 85% 9%,#fff,transparent),radial-gradient(1.5px 1.5px at 93% 22%,#fff,transparent),radial-gradient(1.5px 1.5px at 15% 36%,#fff,transparent),radial-gradient(1.5px 1.5px at 66% 38%,#fff,transparent)}
 #stage[data-t=night] #stars{opacity:1;animation:tw 3s ease-in-out infinite}
 @keyframes tw{50%{opacity:.55}}
-#lamp{left:9.3%;top:44.7%;width:20%;aspect-ratio:1;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,205,100,.95),rgba(255,170,60,.35) 35%,transparent 70%);mix-blend-mode:screen;opacity:0;transition:opacity .8s}
+#lamp{left:var(--lx,9.3%);top:var(--ly,44.7%);width:20%;aspect-ratio:1;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,205,100,.95),rgba(255,170,60,.35) 35%,transparent 70%);mix-blend-mode:screen;opacity:0;transition:opacity .8s}
+#stage[data-l=mystic] #stars{display:none}
 #stage[data-t=night] #lamp{opacity:1}#stage[data-t=sunset] #lamp{opacity:.55}#stage[data-t=dawn] #lamp{opacity:.35}
 #mist{left:-20%;right:-20%;top:52%;height:20%;opacity:0;background:linear-gradient(transparent,rgba(255,255,255,.4),transparent);transition:opacity .8s}
 #stage[data-t=dawn] #mist,#stage[data-l=frost] #mist{opacity:1;animation:drift 14s ease-in-out infinite alternate}
 @keyframes drift{to{transform:translateX(10%)}}
 #fx{inset:0}
+#flash{inset:0;background:#fff;opacity:0;mix-blend-mode:screen}
+#stage[data-w=storm] #flash{animation:flash 7s infinite}
+@keyframes flash{0%,91%,100%{opacity:0}92%{opacity:.55}93%{opacity:.05}94.5%{opacity:.45}96%{opacity:0}}
+#stage[data-w=storm] .pic:before{content:"";position:absolute;inset:0;background:rgba(20,30,55,.3);pointer-events:none;z-index:1}
+#stage[data-w=rain] .pic:before{content:"";position:absolute;inset:0;background:rgba(40,60,95,.14);pointer-events:none;z-index:1}
+#stage[data-w=fog] #mist{opacity:1;top:38%;height:40%;background:linear-gradient(transparent,rgba(235,240,245,.62),transparent)}
+.rain{position:absolute;top:-8%;width:2px;height:13px;background:rgba(200,222,255,.6);transform:rotate(12deg);animation:rainf linear infinite}
+@keyframes rainf{to{top:104%;margin-left:-34px}}
 .snow{position:absolute;top:-5%;background:#fff;border-radius:50%;opacity:.85;animation:snow linear infinite}
 @keyframes snow{to{top:102%}}
 .ff{position:absolute;width:5px;height:5px;border-radius:50%;background:#e8ff8a;box-shadow:0 0 8px 3px rgba(232,255,138,.8);animation:ff ease-in-out infinite}
 @keyframes ff{0%,100%{opacity:0;transform:translate(0,0)}30%,70%{opacity:1}50%{transform:translate(14px,-12px)}}
-@media(prefers-reduced-motion:reduce){#stage[data-t=night] #stars,#stage[data-t=dawn] #mist,#stage[data-l=frost] #mist{animation:none}}
+@media(prefers-reduced-motion:reduce){#stage[data-t=night] #stars,#stage[data-t=dawn] #mist,#stage[data-l=frost] #mist,#stage[data-w=storm] #flash{animation:none}.rain{display:none}}
 #status{background:#17324f;color:#fff;padding:8px 12px;border-top:5px solid var(--wood2);min-height:44px}
 #mini{position:absolute;right:3%;top:6%;bottom:18%;display:flex;gap:6px}
 .trk{position:relative;width:44px;background:rgba(8,30,60,.75);border:4px solid var(--wood2)}
@@ -91,6 +100,10 @@ input[type=number]{font:inherit;width:110px;padding:6px;border:3px solid var(--w
 .up{color:#6fe05a}.down{color:#ff7a6b}
 .row.sel{background:#ffe9a8}
 /* modal + easter egg + polish */
+.subnav{display:flex;gap:8px;margin:0 0 4px}.subnav button.on{background:var(--gold)}
+.item.ord.done{opacity:.6}
+.row .btns{display:flex;flex-direction:column;gap:4px;align-items:stretch}.row .btns button{padding:4px 10px;font-size:15px}.row .btns button.on{background:var(--gold)}
+.tag.hy{background:#b05ad0}
 #modal{position:fixed;inset:0;z-index:30;background:rgba(6,14,26,.74);display:flex;align-items:center;justify-content:center;padding:14px}
 .mbox{background:var(--paper);border:5px solid var(--wood2);box-shadow:0 6px 0 #24130a;padding:16px 18px;max-width:440px;width:100%;max-height:90vh;overflow:auto;-webkit-user-select:text;user-select:text}
 .mbox.gold{background:linear-gradient(#fff6cf,#f3cd6b);border-color:#8a5a0a;box-shadow:0 0 40px 8px rgba(246,183,60,.7),0 6px 0 #24130a}
@@ -138,7 +151,7 @@ body{overscroll-behavior-y:contain}
 /* aquarium */
 #tankwrap{width:min(100%,calc((100vh - 190px)*1.777));margin:0 auto}
 #tank{position:relative;border:5px solid var(--wood2);box-shadow:0 5px 0 #24130a;background:#000;line-height:0;overflow:hidden}
-#tank img{width:100%;display:block;aspect-ratio:1672/941;image-rendering:pixelated}
+#tank img{width:100%;display:block;aspect-ratio:1672/941;image-rendering:auto}
 #tankc{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;cursor:pointer;touch-action:manipulation}
 #petTag{position:absolute;transform:translate(-50%,-100%);background:var(--paper);border:3px solid var(--wood2);padding:3px 9px;line-height:1.15;text-align:center;white-space:nowrap;pointer-events:none;max-width:90%;font-size:15px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
 #petTag small{display:block;opacity:.7;font-size:12px}
@@ -153,7 +166,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 @media(min-width:900px){
  main{max-width:1200px}
  .fgrid{grid-template-columns:auto 330px;justify-content:center;align-items:start}
- .fleft{width:max(480px,min(calc(100vw - 440px),calc((100vh - 320px)*1.5)))}
+ .fleft{width:max(480px,min(calc(100vw - 440px),calc((100vh - 320px)*var(--arn,1.5))))}
  .fright .panel:first-child{margin-top:0}
  .act-panel .chip,.fright .chip{padding:4px 10px;font-size:15px}
  .act-panel #baitChips{gap:6px}
@@ -188,7 +201,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 <header>
   <h1>Shunk Pond</h1>
   <nav id="nav">
-    <button data-v="fish" class="on">Fish</button><button data-v="shop">Shop</button><button data-v="bag">Bag <span id="bagN"></span></button><button data-v="race">Races</button><button data-v="fort">Fortune</button><button data-v="aqua">Tank</button>
+    <button data-v="fish" class="on">Fish</button><button data-v="shop">Shop</button><button data-v="orders">Orders<span id="ordN"></span></button><button data-v="bag">Bag <span id="bagN"></span></button><button data-v="aqua">Tank</button><button data-v="race" data-g="race,fort">Games</button>
   </nav>
   <div class="hr"><button id="mute" aria-label="Toggle sound">Sound on</button>
   <div class="coin"><i></i><span id="money">0</span> shunk</div></div>
@@ -196,7 +209,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 <main>
 <section id="v-fish"><div class="fgrid"><div class="fleft">
   <div id="stage">
-    <div class="pic"><img id="scene" src="assets/idle.png" alt="A boy fishing from a wooden pier" draggable="false"><div id="tint"></div><div id="stars"></div><div id="mist"></div><div id="lamp"></div><div id="fx"></div></div>
+    <div class="pic"><img id="scene" src="assets/idle.webp" onerror="this.onerror=null;this.src='assets/idle.png'" alt="A boy fishing from a wooden pier" draggable="false"><div id="tint"></div><div id="stars"></div><div id="mist"></div><div id="lamp"></div><div id="fx"></div><div id="flash"></div></div>
     <div id="status" aria-live="polite">Pick a bait and cast your line.</div>
     <div id="mini" hidden><div class="trk"><div id="zone"></div><span id="fi">🐟</span></div><div class="pg"><i id="bar"></i></div></div>
     <div id="card" hidden><div><span id="cBan" hidden></span><div class="big" id="cE"></div><h2 id="cN"></h2><p id="cI"></p><button id="cB">Keep fishing</button></div></div>
@@ -217,7 +230,13 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 </section>
 
 <section id="v-shop" hidden>
-  <div class="panel"><h2>Bait shop</h2><p class="muted">You get 2 free worms every new day. Better bait means better odds of rare, heavy fish.</p><div class="grid" id="shopGrid"></div></div>
+  <div class="panel"><h2>Bait shop</h2><p class="muted">You get 2 free worms every new day. Better bait means better odds of rare, heavy fish. Your bait box has a limit, so spend or upgrade it.</p><div class="grid" id="shopGrid"></div></div>
+  <div class="panel"><h2>Workshop</h2><p class="muted">Upgrade your gear. Heavier fish need a stronger line, or the fight gets harder.</p><div class="grid" id="workshop"></div></div>
+  <div class="panel"><h2>Supplies</h2><div class="grid" id="supplies"></div></div>
+</section>
+
+<section id="v-orders" hidden>
+  <div class="panel"><h2>Harbor orders</h2><p class="muted" id="ordInfo" style="margin:0 0 10px"></p><div class="grid" id="ordList"></div></div>
 </section>
 
 <section id="v-bag" hidden>
@@ -232,6 +251,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 </section>
 
 <section id="v-fort" hidden>
+  <div class="subnav"><button data-v="race">Seahorse races</button><button data-v="fort" class="on">Fortune machine</button></div>
   <div class="panel"><h2>Fortune machine</h2>
     <p class="muted" style="margin:0">Choose a fish below, then pull the lever or press SPIN. The reels land on a random multiplier from x0.50 to x1.50, and every value is equally likely, so on average you break even. Your fish's weight and price change by that multiplier. Only the fish you choose is at stake.</p>
     <div id="mach">
@@ -247,15 +267,24 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 </section>
 
 <section id="v-aqua" hidden>
-  <div id="tankwrap"><div id="tank"><img src="assets/aquarium.png" alt="A fish tank" draggable="false"><canvas id="tankc" width="320" height="180"></canvas><div id="petTag" hidden></div></div></div>
+  <div class="ctl" id="tankTabs" style="margin-bottom:8px"></div>
+  <div id="tankwrap"><div id="tank"><img src="assets/aquarium.webp" onerror="this.onerror=null;this.src='assets/aquarium.png'" alt="A fish tank" draggable="false"><canvas id="tankc" width="320" height="180"></canvas><div id="petTag" hidden></div></div></div>
   <p class="muted" style="text-align:center;margin:8px 0 0;color:#9fc3e0">Tap a fish to see its name.</p>
+  <div class="panel"><div id="tankStats"></div><div class="ctl" style="margin-top:8px"><button id="collect">Collect tips</button><button id="feed">Feed fish</button></div></div>
   <div class="agrid">
-    <div class="panel"><h2>In your aquarium <span id="aqN" class="muted"></span></h2><div id="aqList"></div></div>
-    <div class="panel"><h2>Your bag</h2><p class="muted" style="margin:0 0 6px">Put up to 5 fish in the tank. You can take them back out any time.</p><div id="aqBag"></div></div>
+    <div>
+      <div class="panel"><h2>In your aquarium <span id="aqN" class="muted"></span></h2><div id="aqList"></div></div>
+      <div class="panel"><h2>Breeding den</h2><div id="breedBox"></div></div>
+    </div>
+    <div>
+      <div class="panel"><h2>Decorations</h2><p class="muted" style="margin:0 0 6px">Decorations add appeal, which earns more tips from visitors.</p><div id="decorList"></div></div>
+      <div class="panel"><h2>Your bag</h2><p class="muted" style="margin:0 0 6px">Put up to 5 fish in each tank. You can take them back out any time.</p><div id="aqBag"></div></div>
+    </div>
   </div>
 </section>
 
 <section id="v-race" hidden>
+  <div class="subnav"><button data-v="race" class="on">Seahorse races</button><button data-v="fort">Fortune machine</button></div>
   <div class="panel"><h2>Seahorse races</h2>
     <div id="track"></div>
     <div class="picks" id="picks"></div>
@@ -287,20 +316,32 @@ const MARKS=["Dawn","Noon","Dusk","Midnight","Pond","Bayou","Glacier","Cavern"],
 const NSP=SP.length,NV=80,NM=8,TOTAL=NV*NSP*NM;
 const KOI=SP.findIndex(x=>x[0]==="Koi"),DEV=TOTAL;   // DEV = the one and only Platinum fish, "Devanshu"
 const fi=id=>{if(id===DEV)return{v:80,s:KOI,m:0,a:8};const v=id/(NSP*NM)|0;return{v,s:(id/NM|0)%NSP,m:id%NM,a:v/10|0}};
+const PM=.17;   // fish price multiplier (economy rebalance)
 const BAITS=[
- {id:"worm",n:"Worm",e:"🪱",price:15,luck:0,size:1,d:"Plain and cheap."},
- {id:"cricket",n:"Cricket",e:"🦗",price:40,luck:.6,size:1.1,d:"Slightly better odds."},
- {id:"shrimp",n:"Shrimp",e:"🦐",price:90,luck:1.4,size:1.3,d:"Bigger fish bite."},
- {id:"glow",n:"Glow lure",e:"💡",price:200,luck:2.6,size:1.5,d:"Rare fish are drawn to it."},
- {id:"fly",n:"Golden fly",e:"✨",price:500,luck:5,size:1.8,d:"Best odds for legendary catches."},
+ {id:"worm",n:"Worm",e:"🪱",price:10,luck:0,size:1,d:"Plain and cheap."},
+ {id:"cricket",n:"Cricket",e:"🦗",price:18,luck:1.5,size:1.6,d:"Better odds and bigger fish."},
+ {id:"shrimp",n:"Shrimp",e:"🦐",price:30,luck:3.2,size:2.5,d:"Big fish and rare ones bite."},
+ {id:"glow",n:"Glow lure",e:"💡",price:50,luck:5.5,size:4,d:"Rare fish are drawn to it."},
+ {id:"fly",n:"Golden fly",e:"✨",price:80,luck:9,size:6.4,d:"Best odds for legendary catches."},
  {id:"sac",n:"Sacrificial bait",e:"🕯️",price:0,luck:0,size:1,special:1,d:"One use only."}];
+// rod and bait-box upgrades (cost of each next level)
+const UPS={
+ reel:{n:"Reel",e:"🎣",d:"Bigger green zone in the fight",cost:[500,1500,4500,12000,30000],fx:l=>"zone +"+l*7+"%"},
+ line:{n:"Line",e:"🧵",d:"Slower drain and holds heavier fish",cost:[500,1500,4500,12000,30000],fx:l=>"drain -"+l*6+"%, holds "+LINECAP[l]+" kg"},
+ lure:{n:"Lure",e:"🪝",d:"Faster bites and more time to hook",cost:[400,1200,3600,10000,25000],fx:l=>"bites "+l*7+"% faster, +"+l*0.1+"s to hook"},
+ box:{n:"Bait box",e:"🧰",d:"Holds more of each bait",cost:[400,1500,6000],fx:l=>"holds "+BOXCAP[l]+" of each"}};
+const LINECAP=[12,25,50,100,200,400],BOXCAP=[50,100,200,400];
+const boxCap=()=>BOXCAP[(S.up&&S.up.box)||0];
+function addBait(id,n){const have=S.baits[id]||0,add=Math.max(0,Math.min(n,boxCap()-have));S.baits[id]=have+add;return add}
 // lakes: tint filter, luck bonus, weight multiplier, favoured species indexes (3x more likely)
 const LAKES=[
  {id:"pond",n:"Greenwood Pond",cost:0,lf:"brightness(1)",luck:0,size:1,fav:[],d:"Calm and friendly. A bit of everything."},
- {id:"marsh",n:"Amber Marsh",cost:600,lf:"brightness(1)",luck:0,size:1.25,fav:["Carp","Catfish","Eel","Sturgeon","Tench","Bowfin","Gar","Burbot","Loach","Mudskipper","Bream","Paddlefish"],d:"A misty bayou of cypress trees. Heavier fish: carp, catfish, eels and sturgeon."},
- {id:"frost",n:"Frostmere",cost:2000,lf:"brightness(1)",luck:1,size:1,fav:["Trout","Bass","Pike","Salmon","Grayling","Whitefish","Cisco","Burbot","Walleye","Smelt","Muskie","Halibut"],d:"A frozen arctic lake with drifting ice. Better luck, and more trout, bass, pike and salmon."},
- {id:"mystic",n:"Crystal Cavern",cost:6000,lf:"brightness(1)",luck:2.2,size:1.15,fav:["Koi","Tuna","Swordfish","Anglerfish","Coelacanth","Oarfish","Opah","Lamprey","Lionfish","Stonefish","Pufferfish","Mola"],d:"A glowing cave pool. Best odds for legendary fish, and more koi, tuna, swordfish and anglerfish."}];
+ {id:"marsh",n:"Amber Marsh",cost:1500,lf:"brightness(1)",luck:0,size:1.25,fav:["Carp","Catfish","Eel","Sturgeon","Tench","Bowfin","Gar","Burbot","Loach","Mudskipper","Bream","Paddlefish"],d:"A misty bayou of cypress trees. Heavier fish: carp, catfish, eels and sturgeon."},
+ {id:"frost",n:"Frostmere",cost:6000,lf:"brightness(1)",luck:1,size:1,fav:["Trout","Bass","Pike","Salmon","Grayling","Whitefish","Cisco","Burbot","Walleye","Smelt","Muskie","Halibut"],d:"A frozen arctic lake with drifting ice. Better luck, and more trout, bass, pike and salmon."},
+ {id:"mystic",n:"Crystal Cavern",cost:20000,lf:"brightness(1)",luck:2.2,size:1.15,fav:["Koi","Tuna","Swordfish","Anglerfish","Coelacanth","Oarfish","Opah","Lamprey","Lionfish","Stonefish","Pufferfish","Mola"],d:"A glowing cave pool. Best odds for legendary fish, and more koi, tuna, swordfish and anglerfish."}];
 LAKES.forEach(l=>l.fi=l.fav.map(n=>SP.findIndex(x=>x[0]===n)));
+// where the lantern sits in each lake picture (percent), and each picture's width/height shape
+const LAMP={pond:[9.4,45.6],marsh:[8.7,42.2],frost:[10,49.2],mystic:[10,37.8]},AR={pond:1.5,marsh:1672/940,frost:1672/940,mystic:1672/940};
 // times of day: wait = bite delay multiplier
 const TIMES=[
  {id:"dawn",n:"Dawn",tf:"sepia(.18) saturate(1.1) brightness(.97)",tint:"rgba(255,170,140,.22)",wait:.7,luck:0,size:1,d:"Fish bite faster."},
@@ -309,16 +350,35 @@ const TIMES=[
  {id:"night",n:"Night",tf:"brightness(.6) saturate(.85)",tint:"rgba(8,16,60,.5)",wait:1.25,luck:1.5,size:1,d:"Slower bites, much better odds for rare fish."}];
 function curTime(){if(S.time!=="auto")return S.time;const h=new Date().getHours();return h>=8&&h<17?"day":h>=5&&h<8?"dawn":h>=17&&h<19?"sunset":"night"}
 const L_=()=>LAKES.find(x=>x.id===S.lake)||LAKES[0],T_=()=>TIMES.find(x=>x.id===curTime());
-function fxBuild(snow,fly){const f=$("#fx");f.innerHTML="";if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;let h="";
+// weather is the same for every player: it follows the real clock in 3-hour blocks
+const WEATHERS=[
+ {id:"clear",n:"Clear",w:38,luck:0,size:1,wait:1,zs:1,d:"Calm skies. No bonus."},
+ {id:"cloud",n:"Cloudy",w:17,luck:.4,size:1,wait:1,zs:1,d:"Slightly better luck."},
+ {id:"rain",n:"Rain",w:20,luck:0,size:1,wait:.8,zs:1,d:"Fish bite faster."},
+ {id:"fog",n:"Fog",w:12,luck:0,size:1.15,wait:1.1,zs:1,d:"Heavier fish, slower bites."},
+ {id:"storm",n:"Storm",w:13,luck:1.4,size:1,wait:.9,zs:.88,d:"Rare fish stir, but the fight is harder."}];
+const WXB=3*3600*1000;
+function wxNow(){const k=Math.floor(Date.now()/WXB);let h=Math.imul(k^0x9e3779b9,2654435761)>>>0;h=Math.imul(h^(h>>>15),2246822507)>>>0;let r=(h%1000)/1000*WEATHERS.reduce((a,x)=>a+x.w,0);for(const x of WEATHERS){if((r-=x.w)<0)return x}return WEATHERS[0]}
+function wxLeft(){const ms=WXB-Date.now()%WXB,h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);return h?h+"h "+m+"m":m+"m"}
+function moonInfo(){const age=((Date.now()/86400000+2440587.5-2451550.26)%29.530588+29.530588)%29.530588;
+  const names=["New moon","Waxing crescent","First quarter","Waxing gibbous","Full moon","Waning gibbous","Last quarter","Waning crescent"];
+  return{age,name:names[Math.floor(((age+1.85)%29.53)/3.69)%8],full:age>=13.2&&age<=16.4}}
+// everything that changes luck, weight, bite speed and fight difficulty, in one place
+function fx(){const L=L_(),T=T_(),W=wxNow(),u=S.up||{};
+  return{luck:L.luck+T.luck+W.luck+(T.id==="night"&&moonInfo().full?1.2:0),size:L.size*T.size*W.size,wait:T.wait*W.wait*(1-.07*(u.lure||0)),zs:W.zs*(1+.07*(u.reel||0)),ls:1-.06*(u.line||0),hook:1900+100*(u.lure||0)}}
+function fxBuild(snow,fly,rain){const f=$("#fx");f.innerHTML="";if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;let h="";
  if(snow)for(let i=0;i<34;i++){const z=2+(R()*3|0);h+=`<i class="snow" style="left:${R()*100}%;width:${z}px;height:${z}px;animation-duration:${4+R()*5}s;animation-delay:-${R()*9}s"></i>`}
+ if(rain)for(let i=0;i<46;i++)h+=`<i class="rain" style="left:${R()*115}%;animation-duration:${.6+R()*.5}s;animation-delay:-${R()*1.2}s"></i>`;
  if(fly)for(let i=0;i<14;i++)h+=`<i class="ff" style="left:${5+R()*90}%;top:${45+R()*45}%;animation-duration:${3+R()*4}s;animation-delay:-${R()*6}s"></i>`;
  f.innerHTML=h}
 function applyScene(){
   const L=L_(),T=T_(),g=$("#stage");
   g.style.setProperty("--lf",L.lf);g.style.setProperty("--tf",T.tf);g.style.setProperty("--tint",T.tint);g.dataset.t=T.id;g.dataset.l=L.id;
-  if(applyScene.l!==L.id){applyScene.l=L.id;["idle","bite","catch"].forEach(n=>{const p=new Image();p.src="assets/"+(L.id==="pond"?"":L.id+"_")+n+".png"});if(st==="idle")img("idle")}
-  const k=L.id+T.id;if(applyScene.k!==k){applyScene.k=k;fxBuild(L.id==="frost",T.id==="night"||L.id==="mystic")}
-  $("#sceneInfo").innerHTML=`<b>${L.n}:</b> ${L.d}<br><b>${T.n}:</b> ${T.d}`;
+  if(applyScene.l!==L.id){applyScene.l=L.id;["idle","bite","catch"].forEach(n=>loadArt(new Image(),L.id,n));if(st==="idle")img("idle")}
+  {const v=$("#v-fish"),lp=LAMP[L.id]||LAMP.pond;v.style.setProperty("--lx",lp[0]+"%");v.style.setProperty("--ly",lp[1]+"%");setAR(AR[L.id]||1.5)}
+  const W=wxNow(),mo=moonInfo();g.dataset.w=W.id;
+  const k=L.id+T.id+W.id;if(applyScene.k!==k){applyScene.k=k;fxBuild(L.id==="frost",(T.id==="night"&&L.id!=="frost")||L.id==="mystic",(W.id==="rain"||W.id==="storm")&&L.id!=="mystic")}
+  $("#sceneInfo").innerHTML=`<b>${L.n}:</b> ${L.d}<br><b>${T.n}:</b> ${T.d}<br><b>Weather, ${W.n}:</b> ${W.d} <span class="muted">(changes in ${wxLeft()})</span><br><b>Moon, ${mo.name}:</b> ${mo.full?(T.id==="night"?"Rare fish are stirring tonight!":"Rare fish stir on moonlit nights."):"No moon bonus."}`;
 }
 function sceneChips(){
   $("#lakeChips").innerHTML='<span class="muted">Lake</span>'+LAKES.map(l=>`<button class="chip ${S.lake===l.id?"on":""}" data-lake="${l.id}">${S.lakes[l.id]?"":"🔒 "}${l.n}${S.lakes[l.id]?"":" ("+l.cost+")"}</button>`).join("");
@@ -329,27 +389,36 @@ const fem=id=>SP[fi(id).s][1];
 
 /* ---------- save ---------- */
 const KEY="shunkpond.v1";
-let S={shunk:50,baits:{},bag:[],dex:{},day:"",sel:"worm",caught:0,lake:"pond",time:"auto",lakes:{pond:1},fails:0,v:2,recent:[],rw:[0,0,0,0,0,0],aq:[]};
+let S={shunk:50,baits:{},bag:[],dex:{},day:"",sel:"worm",caught:0,lake:"pond",time:"auto",lakes:{pond:1},fails:0,v:3,recent:[],rw:[0,0,0,0,0,0],up:{reel:0,line:0,lure:0,box:0},items:{food:0},tanks:null,tk:0};
 try{const raw=JSON.parse(localStorage.getItem(KEY)||"{}");
   if(raw.dex&&!raw.v){const cv=o=>(Math.floor(o/14)*10*NSP+o%14)*8+1,nd={};for(const k in raw.dex)nd[cv(+k)]=raw.dex[k];raw.dex=nd;(raw.bag||[]).forEach(f=>f.id=cv(f.id));raw.v=2}
+  if(raw.v===2){   // v3: economy rebalance, bait box limit, tanks
+    const OLD={worm:15,cricket:40,shrimp:90,glow:200,fly:500};let refund=0;raw.baits=raw.baits||{};
+    for(const k in OLD){const n=raw.baits[k]||0;if(n>50){refund+=(n-50)*OLD[k];raw.baits[k]=50}}
+    raw.shunk=(raw.shunk||0)+refund;
+    const sc=f=>{if(f.id!==DEV)f.p=Math.max(1,Math.round(f.p*PM))};(raw.bag||[]).forEach(sc);(raw.aq||[]).forEach(sc);
+    raw.tanks=[{theme:"classic",fish:raw.aq||[],decor:[],eggs:[],t:Date.now()}];delete raw.aq;raw.tk=0;raw.v=3;window.__refund=refund}
   Object.assign(S,raw)}catch(e){}
+if(!S.up)S.up={};["reel","line","lure","box"].forEach(k=>{S.up[k]=S.up[k]||0});if(!S.items)S.items={food:0};
+if(!S.tanks||!S.tanks.length)S.tanks=[{theme:"classic",fish:[],decor:[],eggs:[],t:Date.now()}];if(!S.tanks[S.tk])S.tk=0;
+delete S.aq;Object.defineProperty(S,"aq",{get(){return S.tanks[S.tk].fish},enumerable:false,configurable:true});   // S.aq = fish in the tank you are looking at
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
-function daily(){const d=new Date().toDateString();if(S.day!==d){S.day=d;S.baits.worm=(S.baits.worm||0)+2;save();toast("Daily gift: 2 free worms added to your bait box.")}}
+function daily(){const d=new Date().toDateString();if(!S.orders||S.orders.day!==d){newOrders(d);save()}if(S.day!==d){S.day=d;const k=addBait("worm",2);save();toast(k?"Daily gift: "+k+" free worm"+(k>1?"s":"")+" added to your bait box.":"Daily gift: your bait box is already full.")}}
 
 /* ---------- dialogs ---------- */
 function modal(title,html,btns,cls){const b=$("#mBtns");$("#mT").textContent=title;$("#mB").innerHTML=html;b.innerHTML="";$(".mbox").className="mbox "+(cls||"");
   btns.forEach(x=>{const e=document.createElement("button");e.textContent=x[0];if(x[2])e.style.background="var(--gold)";e.onclick=()=>{$("#modal").hidden=true;if(x[1])x[1]()};b.appendChild(e)});
   $("#modal").hidden=false;if(b.lastChild)b.lastChild.focus()}
 const ask=(t,h,ok,cb)=>modal(t,h,[["Cancel"],[ok,cb,1]]);
-function setView(v){view=v;document.querySelectorAll("main>section").forEach(s=>s.hidden=s.id!=="v-"+v);document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo(0,0);if(v==="aqua")aquaStart()}
+function setView(v){view=v;document.querySelectorAll("main>section").forEach(s=>s.hidden=s.id!=="v-"+v);document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v||(b.dataset.g||"").split(",").includes(v)));document.querySelectorAll(".subnav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo(0,0);if(v==="aqua")aquaStart()}
 
 /* ---------- rendering ---------- */
 let view="fish";
 function rescue(){
   if(racing||(st!=="idle"))return;
   const have=BAITS.filter(b=>!b.special).reduce((a,b)=>a+(S.baits[b.id]||0),0),cheapest=Math.min(...BAITS.filter(b=>!b.special).map(b=>b.price));
-  const worth=S.shunk+S.bag.reduce((a,f)=>a+f.p,0)+(S.aq||[]).reduce((a,f)=>a+f.p,0);
+  const worth=S.shunk+S.bag.reduce((a,f)=>a+f.p,0)+S.tanks.reduce((a,t)=>a+t.fish.reduce((b,f)=>b+f.p,0),0);
   if(have===0&&worth<cheapest){S.baits.worm=2;S.sel="worm";save();play("coin");toast("You were out of bait and shunk, so a kind old fisherman gave you 2 worms.")}
 }
 function render(){
@@ -358,11 +427,13 @@ function render(){
   $("#bagN").textContent=S.bag.length?"("+S.bag.length+")":"";
   sceneChips();
   $("#baitChips").innerHTML=BAITS.filter(b=>!b.special||S.baits[b.id]>0).map(b=>`<button class="chip ${S.sel===b.id?"on":""}${b.special?" sac":""}" data-bait="${b.id}">${b.e} ${b.n} x${S.baits[b.id]||0}</button>`).join("");
-  $("#shopGrid").innerHTML=BAITS.filter(b=>!b.special).map(b=>`<div class="item"><div class="e">${b.e}</div><b>${b.n}</b> <span class="muted">(owned ${S.baits[b.id]||0})</span><p class="muted">${b.d}</p><button data-buy="${b.id}:1" ${S.shunk<b.price?"disabled":""}>Buy 1 · ${b.price}</button> <button data-buy="${b.id}:5" ${S.shunk<b.price*5?"disabled":""}>Buy 5 · ${b.price*5}</button></div>`).join("");
+  $("#shopGrid").innerHTML=BAITS.filter(b=>!b.special).map(b=>{const own=S.baits[b.id]||0,room=boxCap()-own,can=Math.min(room,Math.floor(S.shunk/b.price));return `<div class="item"><div class="e">${b.e}</div><b>${b.n}</b> <span class="muted">${own} / ${boxCap()}</span><p class="muted">${b.d}</p><button data-buy="${b.id}:1" ${room<1||S.shunk<b.price?"disabled":""}>Buy 1 · ${b.price}</button> <button data-buy="${b.id}:10" ${room<10||S.shunk<b.price*10?"disabled":""}>Buy 10 · ${b.price*10}</button> <button data-buy="${b.id}:max" ${can<1?"disabled":""}>Fill · ${can*b.price}</button></div>`}).join("");
+  $("#workshop").innerHTML=Object.keys(UPS).map(k=>{const u=UPS[k],l=S.up[k]||0,max=u.cost.length,c=u.cost[l];return `<div class="item"><div class="e">${u.e}</div><b>${u.n}</b> <span class="muted">${"●".repeat(l)}${"○".repeat(max-l)}</span><p class="muted" style="margin:4px 0">${u.d}.<br>Now: ${l?u.fx(l):"no bonus"}${l<max?"<br>Next: "+u.fx(l+1):""}</p>${l<max?`<button data-up="${k}" ${S.shunk<c?"disabled":""}>Upgrade · ${c.toLocaleString()}</button>`:'<span class="tag" style="background:#3f9a2c">Maxed</span>'}</div>`}).join("");
+  $("#supplies").innerHTML=`<div class="item"><div class="e">🍤</div><b>Fish food</b> <span class="muted">you have ${S.items.food||0}</span><p class="muted">Feed your aquarium fish and they slowly grow heavier and worth more.</p><button data-food="1" ${S.shunk<20?"disabled":""}>Buy 1 · 20</button> <button data-food="10" ${S.shunk<200?"disabled":""}>Buy 10 · 200</button></div>`;
   const tot=S.bag.reduce((a,f)=>a+(f.id===DEV?0:f.p),0);
   $("#bagTot").textContent=S.bag.length?S.bag.length+" fish worth "+tot+" shunk":"";
   $("#sellAll").disabled=!S.bag.length;
-  $("#bagList").innerHTML=S.bag.length?S.bag.map((f,i)=>`<div class="row"><span style="font-size:26px">${fem(f.id)}</span><span class="n">${fname(f.id)} <span class="tag" style="background:${RC[fi(f.id).a]}">${RAR[fi(f.id).a]}</span><br><span class="muted">${f.w} kg</span></span><button data-sell="${i}">Sell · ${f.p.toLocaleString()}</button></div>`).join(""):'<p class="muted">Your bag is empty. Go catch something.</p>';
+  $("#bagList").innerHTML=S.bag.length?S.bag.map((f,i)=>`<div class="row"><span style="font-size:26px">${fem(f.id)}</span><span class="n">${fname(f.id)} <span class="tag" style="background:${RC[fi(f.id).a]}">${RAR[fi(f.id).a]}</span>${hyTag(f)}<br><span class="muted">${f.w} kg</span></span><button data-sell="${i}">Sell · ${f.p.toLocaleString()}</button></div>`).join(""):'<p class="muted">Your bag is empty. Go catch something.</p>';
   const cnt=new Array(NSP).fill(0),tc=new Array(9).fill(0);let n=0;
   for(const k in S.dex){if(+k===DEV){tc[8]++;continue}const q=fi(+k);cnt[q.s]++;tc[q.a]++;n++}
   const per=NV/8*NSP*NM;
@@ -372,11 +443,11 @@ function render(){
   $("#stats").textContent="Fish caught: "+S.caught.toLocaleString()+". Different fish discovered: "+n.toLocaleString()+".";
   $("#dex").innerHTML=SP.map((s,i)=>`<span title="${s[0]}: ${cnt[i]} of ${NV*NM} found" style="${cnt[i]?"background:#fff6dc;border-color:#3f9a2c":""}">${cnt[i]?s[1]:"?"}</span>`).join("");
   $("#dexRecent").innerHTML=(S.recent||[]).length?S.recent.map(id=>`<div class="row"><span style="font-size:22px">${fem(id)}</span><span class="n">${fname(id)}</span><span class="tag" style="background:${RC[fi(id).a]}">${RAR[fi(id).a]}</span></div>`).join(""):'<p class="muted">Nothing yet. Go fishing!</p>';
-  raceTally();fortRender();aquaRender();
+  raceTally();fortRender();aquaRender();ordersRender();
   lab();
 }
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-bait],[data-buy],[data-sell],[data-v],[data-lake],[data-time],[data-fort],[data-aqadd],[data-aqout]");if(!t)return;
+  const t=e.target.closest("[data-bait],[data-buy],[data-up],[data-food],[data-od],[data-rr],[data-dv],[data-tk],[data-buytank],[data-deco],[data-par],[data-breed],[data-hatch],[data-sell],[data-v],[data-lake],[data-time],[data-fort],[data-aqadd],[data-aqout]");if(!t)return;
   if(t.dataset.v){setView(t.dataset.v);return}
   if(t.dataset.lake||t.dataset.time){
     if(!(st==="idle"||st==="done"))return toast("Finish this cast first.");
@@ -390,7 +461,24 @@ document.addEventListener("click",e=>{
   if(t.dataset.aqadd){const f=S.bag[+t.dataset.aqadd];if(!f)return;if(S.aq.length>=5)return toast("The aquarium is full (5 fish). Put one back in your bag first.");S.bag.splice(+t.dataset.aqadd,1);S.aq.push(f);save();render();toast(fname(f.id)+" is now swimming in your aquarium.");return}
   if(t.dataset.aqout){const f=S.aq[+t.dataset.aqout];if(!f)return;S.aq.splice(+t.dataset.aqout,1);S.bag.push(f);save();render();toast("Back in your bag.");return}
   if(t.dataset.bait){if(st==="idle"||st==="done"){S.sel=t.dataset.bait;save();render()}return}
-  if(t.dataset.buy){const[id,n]=t.dataset.buy.split(":"),b=BAITS.find(x=>x.id===id),c=b.price*n;if(S.shunk<c)return;S.shunk-=c;S.baits[id]=(S.baits[id]||0)+ +n;play("coin");save();render();toast("Bought "+n+" "+b.n+(n>1?"s":""));return}
+  if(t.dataset.buy){const[id,n]=t.dataset.buy.split(":"),b=BAITS.find(x=>x.id===id),room=boxCap()-(S.baits[id]||0);
+    const k=n==="max"?Math.min(room,Math.floor(S.shunk/b.price)):Math.min(+n,room);
+    if(room<1)return toast("Your bait box is full. Upgrade it in the Workshop.");if(k<1||S.shunk<k*b.price)return;
+    S.shunk-=k*b.price;addBait(id,k);play("coin");save();render();toast("Bought "+k+" "+b.n+(k>1?"s":""));return}
+  if(t.dataset.tk){S.tk=+t.dataset.tk;par=[];aqSel=null;tagContent();save();render();return}
+  if(t.dataset.buytank){const i=S.tanks.length,T=TANKS[i];if(!T)return;if(S.shunk<T.cost)return toast("A new tank costs "+T.cost.toLocaleString()+" shunk.");
+    return ask("Buy the "+T.n+"?","<p>A second place for 5 more fish, with its own look, decorations and tips.</p><p>Costs <b>"+T.cost.toLocaleString()+" shunk</b>.</p>","Buy tank",()=>{if(S.shunk<T.cost)return;S.shunk-=T.cost;S.tanks.push({theme:T.theme,fish:[],decor:[],eggs:[],t:Date.now()});S.tk=i;par=[];play("record");save();render();toast(T.n+" is ready!")})}
+  if(t.dataset.deco){const id=t.dataset.deco,D=DECOR[id],tkk=tk();if(tkk.decor.includes(id))return;if(S.shunk<D.cost)return toast("Not enough shunk.");S.shunk-=D.cost;tkk.decor.push(id);play("coin");save();render();toast(D.n+" added to the tank.");return}
+  if(t.dataset.par){const i=+t.dataset.par;par=par.includes(i)?par.filter(x=>x!==i):[...par,i].slice(-2);render();return}
+  if(t.dataset.breed){startBreed();return}
+  if(t.dataset.hatch){hatchEgg();return}
+  if(t.dataset.od){const o=S.orders.list[+t.dataset.od];if(!o||o.done)return;
+    const rows=S.bag.map((f,i)=>okf(o,f)?`<div class="row"><span style="font-size:22px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))}<br><span class="muted">${f.w} kg, worth ${f.p.toLocaleString()} shunk</span></span><button data-dv="${t.dataset.od}:${i}">Deliver</button></div>`:"").join("");
+    modal("Deliver a fish","<p>"+orderText(o)+"</p>"+(rows||"<p class='muted'>No fish in your bag matches.</p>"),[["Close"]]);return}
+  if(t.dataset.dv){const[oi,bi]=t.dataset.dv.split(":").map(Number);$("#modal").hidden=true;deliver(oi,bi);return}
+  if(t.dataset.rr){const o=S.orders.list[+t.dataset.rr];if(!o||o.done)return;const c=50*(o.rr+1);if(S.shunk<c)return toast("Not enough shunk.");S.shunk-=c;S.orders.list[+t.dataset.rr]={...genOrder(S.orders.day,+t.dataset.rr,o.rr+1),rr:o.rr+1,done:false};play("coin");save();render();return}
+  if(t.dataset.up){const k=t.dataset.up,u=UPS[k],l=S.up[k]||0;if(l>=u.cost.length)return;const c=u.cost[l];if(S.shunk<c)return toast("Not enough shunk.");S.shunk-=c;S.up[k]=l+1;play("record");save();render();toast(u.n+" upgraded: "+u.fx(l+1));return}
+  if(t.dataset.food){const n=+t.dataset.food,c=n*20;if(S.shunk<c)return;S.shunk-=c;S.items.food=(S.items.food||0)+n;play("coin");save();render();toast("Bought "+n+" fish food.");return}
   if(t.dataset.sell){const f=S.bag[+t.dataset.sell];if(!f)return;
     const go=()=>{const j=S.bag.indexOf(f);if(j<0)return;S.bag.splice(j,1);S.shunk+=f.p;play("coin");save();render();toast("Sold "+fname(f.id)+" for "+f.p.toLocaleString()+" shunk")};
     if(f.id===DEV)ask("Sell Devanshu?","<p>He is <b>one of one</b> and will never bite again. You would get <b>25,000 shunk</b>.</p><p class='muted'>You can keep him in your aquarium instead.</p>","Sell for 25,000",go);else go()}
@@ -428,18 +516,22 @@ $("#mute").onclick=()=>{S.mute=!S.mute;save();muteLab();if(!S.mute)play("coin")}
 
 /* ---------- fishing ---------- */
 let st="idle",hold=false,tm,rf,cur,used;
-const img=k=>$("#scene").src=new URL("assets/"+(S.lake==="pond"?"":S.lake+"_")+k+".png",location.href).href;
+const artUrl=(lake,k,png)=>"assets/"+(lake==="pond"?"":lake+"_")+k+(png?".png":".webp");
+function loadArt(el,lake,k){el.onerror=()=>{el.onerror=null;el.src=artUrl(lake,k,1)};el.src=artUrl(lake,k)}   // WebP first (small), PNG if a WebP is missing
+const img=k=>loadArt($("#scene"),S.lake,k);
+function setAR(r){const v=$("#v-fish");v.style.setProperty("--ar",r);v.style.setProperty("--arn",r)}
+$("#scene").addEventListener("load",e=>{const i=e.target;if(i.naturalWidth&&i.naturalHeight)setAR(i.naturalWidth/i.naturalHeight)});
 const say=t=>$("#status").textContent=t;
 function lab(){$("#act").textContent={idle:"Cast line",wait:"Waiting…",bite:"HOOK IT!",reel:"Hold to reel",done:"Tap Keep fishing"}[st]}
 function roll(b){
-  const L=L_(),T=T_(),lk=b.luck+L.luck+T.luck;
-  const ws=ADJ.map((a,i)=>a[1]*(1+lk*i*.35));let r=R()*ws.reduce((x,y)=>x+y),a=0;while(a<7&&(r-=ws[a])>0)a++;
+  const L=L_(),T=T_(),X=fx(),lk=b.luck+X.luck;
+  const ws=ADJ.map((a,i)=>a[1]*Math.pow(1+lk*.15,i));let r=R()*ws.reduce((x,y)=>x+y),a=0;while(a<7&&(r-=ws[a])>0)a++;
   const sw=SP.map((_,i)=>L.fi.includes(i)?10:1);let q=R()*sw.reduce((x,y)=>x+y),s=0;while(s<SP.length-1&&(q-=sw[s])>0)s++;
   const ti=TIMES.indexOf(T),li=LAKES.indexOf(L),mw=MARKS.map((_,i)=>1+(i===ti?5:0)+(i===4+li?5:0));
   let z=R()*mw.reduce((x,y)=>x+y),m=0;while(m<7&&(z-=mw[m])>0)m++;
   const v=a*10+(R()*10|0);
-  const w=+(SP[s][2]*(.5+R()*1.2)*(1+a*.08)*Math.sqrt(b.size*L.size*T.size)).toFixed(2);
-  return{id:(v*NSP+s)*NM+m,w,p:Math.max(1,Math.round(w*SP[s][3]*ADJ[a][2]))};
+  const w=+(SP[s][2]*(.5+R()*1.2)*(1+a*.08)*Math.sqrt(b.size*X.size)).toFixed(2);
+  return{id:(v*NSP+s)*NM+m,w,p:Math.max(1,Math.round(w*SP[s][3]*ADJ[a][2]*PM))};
 }
 function act(){
   if(view!=="fish"||!$("#modal").hidden)return;
@@ -458,7 +550,7 @@ function castNow(b){
   S.baits[b.id]--;used=b;st="wait";play("cast");
   if(b.special){S.sacActive=true;S.sel="worm";$("#stage").classList.add("dev")}
   save();render();lab();img("idle");say(b.special?"The sacrifice sinks into the dark water…":"Line is out. Wait for a nibble…");
-  tm=setTimeout(bite,b.special?3500+R()*2500:(2500+R()*5500)*T_().wait);
+  tm=setTimeout(bite,b.special?3500+R()*2500:(2500+R()*5500)*fx().wait);
 }
 const rel=()=>hold=false;
 function bite(){
@@ -466,7 +558,7 @@ function bite(){
   if(dev){if(document.hidden){tm=setTimeout(bite,1000);return}if(view!=="fish")setView("fish")}
   cur=dev?{id:DEV,w:25,p:25000}:roll(used);st="bite";play(dev?"gong":"bite");lab();img("bite");
   say(dev?"A golden shape rises from the deep! Hook it NOW!":"Something bit! Hook it now!");
-  tm=setTimeout(()=>lose("Too slow. It spat out the bait."),dev?3000:1900)}
+  tm=setTimeout(()=>lose("Too slow. It spat out the bait."),dev?3000:fx().hook)}
 function lose(m){
   if(S.sacActive&&cur&&cur.id===DEV)return devFail();
   play("lose");cancelAnimationFrame(rf);hold=false;st="idle";$("#mini").hidden=true;img("idle");say(m);render()}
@@ -489,23 +581,32 @@ function eggCheck(){
 window.__eggTest=()=>{for(let v=70;v<80;v++)for(let s=0;s<NSP;s++)for(let m=0;m<NM;m++)S.dex[(v*NSP+s)*NM+m]=1;save();render();eggCheck()};   // tester shortcut: marks every Mythic fish as caught
 function reelInit(c){
   if(c.id===DEV)return{d:1,zs:.11,y:.3,v:0,f:.5,tg:.5,t:1,p:30,age:0,jr:.5,ap:4.5,ls:18,gn:26};   // hard on purpose, but a focused player can win
-  const a=fi(c.id).a,d=Math.min(1,.1+a*.1+Math.min(c.w/60,.2));
-  const ease=1+Math.min(.5,(S.fails||0)*.12)+(S.caught<3?.3:0);
-  return{d,zs:Math.min(.55,(.32-d*.20)*ease),y:.3,v:0,f:.5,tg:.5,t:1,p:40,age:0,jr:.26+d*.40,ap:1.5+d*2.8,ls:6+d*13,gn:26};
+  const X=fx(),a=fi(c.id).a,d=Math.min(1,.1+a*.1+Math.min(c.w/60,.2)),beh=behOf(c);
+  const pity=a<=4?Math.min(.4,(S.fails||0)*.1):0,ease=1+pity+(S.caught<3?.3:0);
+  const strain=Math.max(0,c.w/LINECAP[S.up.line||0]-1),sm=1+Math.min(1.2,strain*.6);
+  let jr=.28+d*.42,ap=1.6+d*2.9;
+  if(beh==="drifter"){jr*=1.35;ap*=.7}
+  return{d,beh,strain,zs:Math.min(.55,(.30-d*.19)*ease*X.zs),y:.3,v:0,f:.5,tg:.5,t:1,p:40,age:0,jr,ap,ls:(7+d*14)*X.ls*sm,gn:26,run:0,rt:2+R()*2};
 }
+const BEHN={darter:"Darter: quick little moves.",drifter:"Drifter: big, slow swings.",runner:"Runner: watch for sudden runs!",diver:"Diver: stays low, then bolts up."};
+const behOf=c=>["darter","drifter","runner","diver"][BT[SP[fi(c.id).s][0]]||0];
 function reelStep(r,dt,hold){
   r.age+=dt;
   r.v+=(hold?4.5:-3.5)*dt;r.v*=Math.pow(.9,dt*60);r.y+=r.v*dt;
   const mx=1-r.zs;if(r.y<0){r.y=0;r.v=0}if(r.y>mx){r.y=mx;r.v=0}
-  r.t-=dt;if(r.t<=0){const sp=r.jr;r.tg=Math.max(.05,Math.min(.95,r.f+(Math.random()-.5)*2*sp));r.t=1+Math.random()*(1.4-r.d*.6)}
-  r.f+=(r.tg-r.f)*Math.min(1,dt*r.ap);
+  r.t-=dt;if(r.t<=0){const sp=r.jr;
+    r.tg=r.beh==="diver"?(Math.random()<.78?.05+Math.random()*.5:.6+Math.random()*.35):Math.max(.05,Math.min(.95,r.f+(Math.random()-.5)*2*sp));
+    r.t=(r.beh==="drifter"?1.6:1)+Math.random()*(1.4-r.d*.6)}
+  if(r.beh==="runner"){r.rt-=dt;if(r.rt<=0){r.rt=2.6+Math.random()*2.4;r.run=.75;r.tg=r.f<.5?.93:.07}}
+  const boost=r.run>0?2.6:1;if(r.run>0)r.run-=dt;
+  r.f+=(r.tg-r.f)*Math.min(1,dt*r.ap*boost);
   const on=r.f>r.y&&r.f<r.y+r.zs;
   r.p+=on?r.gn*dt:-(r.age<1.5?0:r.ls)*dt;
   return r.p>=100?"win":r.p<=0?"lose":null;
 }
 function startReel(){
   st="reel";play("hook");lab();$("#mini").hidden=false;hold=true;say("Hold to raise the green zone. Keep the fish inside it!");
-  const r=reelInit(cur);$("#fi").textContent=fem(cur.id);$("#fi").className=cur.id===DEV?"gold":"";if(cur.id===DEV)say("Devanshu fights back! Keep him in the zone!");$("#zone").style.height=r.zs*100+"%";let last=performance.now();
+  const r=reelInit(cur);$("#fi").textContent=fem(cur.id);$("#fi").className=cur.id===DEV?"gold":"";if(cur.id===DEV)say("Devanshu fights back! Keep him in the zone!");else say(BEHN[r.beh]+(r.strain>0?" Heavy! Your line is straining.":" Hold to lift the zone."));$("#zone").style.height=r.zs*100+"%";let last=performance.now();
   const loop=n=>{
     const dt=Math.min(.05,(n-last)/1000);last=n;const res=reelStep(r,dt,hold);
     $("#zone").style.bottom=r.y*100+"%";$("#fi").style.bottom="calc("+r.f*100+"% - 12px)";$("#bar").style.height=Math.max(0,Math.min(100,r.p))+"%";
@@ -635,7 +736,7 @@ function makeSprite(f){
     frames.push(c)}
   return{frames,W,Ht,L,Hh};
 }
-const AQ=[],BUB=[],SPK=[],PLK=Array.from({length:18},()=>({x:AB.x0+R()*(AB.x1-AB.x0),y:AB.y0+R()*(AB.y1-AB.y0),vx:(R()-.5)*4,vy:(R()-.5)*2,a:.15+R()*.25}));
+const AQ=[],BUB=[],SPK=[],PEL=[],PLK=Array.from({length:18},()=>({x:AB.x0+R()*(AB.x1-AB.x0),y:AB.y0+R()*(AB.y1-AB.y0),vx:(R()-.5)*4,vy:(R()-.5)*2,a:.15+R()*.25}));
 let aqSel=null,aqSelT=0,aqRun=false,aqLast=0;
 const nameOf=f=>f.pet||fname(f.id);
 function pickTarget(a){const hw=a.sp.W/2,hh=a.sp.Ht/2;a.tx=AB.x0+hw+R()*(AB.x1-AB.x0-2*hw);let y0=AB.y0+hh+4,y1=AB.y1-hh;
@@ -650,10 +751,14 @@ function aquaSync(){
 function bubble(x,y){BUB.push({x,y,v:9+R()*10,w:R()*6,r:R()<.3?2:1})}
 function aquaStep(dt){
   AQ.forEach(a=>{
-    a.t+=dt;const hw=a.sp.W/2,hh=a.sp.Ht/2,dx=a.tx-a.x,dy=a.tgy-a.y,d=Math.hypot(dx,dy)||1;
+    a.t+=dt;const hw=a.sp.W/2,hh=a.sp.Ht/2;
+    let pel=null;   // hungry fish swim to the nearest food pellet and eat it
+    if(PEL.length&&(a.f.full||0)<Date.now()){let bd=1e9;PEL.forEach(p=>{const dd=Math.hypot(p.x-a.x,p.y-a.y);if(dd<bd){bd=dd;pel=p}});
+      if(pel){a.tx=pel.x;a.tgy=pel.y;a.pause=0;if(bd<a.L*.45+3){PEL.splice(PEL.indexOf(pel),1);eatPellet(a);pel=null}}}
+    const dx=a.tx-a.x,dy=a.tgy-a.y,d=Math.hypot(dx,dy)||1;
     if(a.pause>0){a.pause-=dt;const k=1-Math.min(1,dt*3);a.vx*=k;a.vy*=k}
     else{if(d<5){a.pause=.3+R()*(R()<.35?3.5:1.2);pickTarget(a)}
-      const sp=a.speed*(d>30?1:.45+d/55),k=Math.min(1,dt*2);a.vx+=(dx/d*sp-a.vx)*k;a.vy+=(dy/d*sp*.55-a.vy)*k}
+      const sp=a.speed*(pel?1.7:1)*(d>30?1:.45+d/55),k=Math.min(1,dt*2);a.vx+=(dx/d*sp-a.vx)*k;a.vy+=(dy/d*sp*.55-a.vy)*k}
     AQ.forEach(b=>{if(b===a)return;const ox=a.x-b.x,oy=a.y-b.y,od=Math.hypot(ox,oy)||1;if(od<(a.L+b.L)*.4){a.vx+=ox/od*dt*45;a.vy+=oy/od*dt*45}});
     a.x+=a.vx*dt;a.y+=a.vy*dt;
     if(a.x<AB.x0+hw){a.x=AB.x0+hw;pickTarget(a)}if(a.x>AB.x1-hw){a.x=AB.x1-hw;pickTarget(a)}
@@ -665,6 +770,8 @@ function aquaStep(dt){
     if(a.aura!==null&&R()<dt*3)SPK.push({x:a.x+(R()-.5)*a.sp.W,y:a.y+(R()-.5)*a.sp.Ht,l:.7,h:a.aura})
   });
   if(R()<dt*1.1)bubble(AB.x0+R()*(AB.x1-AB.x0),AB.y1-2);
+  S.tanks[S.tk].decor.forEach(id=>{const dx=DECOR[id].x;if(id==="bubbler"&&R()<dt*3.5)bubble(dx+(R()-.5)*5,AB.y1-6);if(id==="chest"&&chestOpen()&&R()<dt*9)bubble(dx+(R()-.5)*8,AB.y1-10)});
+  for(let i=PEL.length-1;i>=0;i--){const p=PEL[i];p.y=Math.min(AB.y1-1,p.y+p.vy*dt);p.x+=Math.sin(p.y*.3)*.1;p.life-=dt;if(p.life<=0)PEL.splice(i,1)}
   for(let i=BUB.length-1;i>=0;i--){const b=BUB[i];b.y-=b.v*dt;b.x+=Math.sin(b.y*.25+b.w)*.15;if(b.y<AB.y0-2)BUB.splice(i,1)}
   for(let i=SPK.length-1;i>=0;i--){SPK[i].l-=dt;if(SPK[i].l<=0)SPK.splice(i,1)}
   PLK.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.x<AB.x0)p.x=AB.x1;if(p.x>AB.x1)p.x=AB.x0;if(p.y<AB.y0)p.y=AB.y1;if(p.y>AB.y1)p.y=AB.y0});
@@ -673,32 +780,96 @@ function aquaStep(dt){
 function aquaDraw(){
   const x=$("#tankc").getContext("2d");x.clearRect(0,0,AW,AH);x.imageSmoothingEnabled=false;
   PLK.forEach(p=>{x.fillStyle=`rgba(200,240,255,${p.a})`;x.fillRect(p.x|0,p.y|0,1,1)});
+  drawScenery(x);
   [...AQ].sort((a,b)=>a.y-b.y).forEach(a=>{
     if(a.aura!==null){x.globalCompositeOperation="lighter";const g=x.createRadialGradient(a.x,a.y,2,a.x,a.y,a.L*1.1);g.addColorStop(0,`hsla(${a.aura},90%,60%,.35)`);g.addColorStop(1,`hsla(${a.aura},90%,60%,0)`);x.fillStyle=g;x.fillRect(a.x-a.L*1.2,a.y-a.L*1.2,a.L*2.4,a.L*2.4);x.globalCompositeOperation="source-over"}
     x.save();x.translate(Math.round(a.x),Math.round(a.y+Math.sin(a.t*1.6+a.bob)*.8));x.scale(a.sx,1);
     x.drawImage(a.sp.frames[Math.floor(a.ph)%4],-Math.round(a.sp.W/2),-Math.round(a.sp.Ht/2));x.restore();
     if(aqSel===a){x.strokeStyle="rgba(255,255,255,.55)";x.strokeRect(Math.round(a.x-a.sp.W/2-2)+.5,Math.round(a.y-a.sp.Ht/2-2)+.5,a.sp.W+3,a.sp.Ht+3)}
   });
+  PEL.forEach(p=>{x.fillStyle="#d9a85c";x.fillRect(p.x|0,p.y|0,2,2);x.fillStyle="#f3d79a";x.fillRect(p.x|0,p.y|0,1,1)});
   BUB.forEach(b=>{x.fillStyle="rgba(215,245,255,.75)";x.fillRect(b.x|0,b.y|0,b.r,b.r);x.fillStyle="rgba(255,255,255,.9)";x.fillRect(b.x|0,b.y|0,1,1)});
   SPK.forEach(p=>{x.fillStyle=`hsla(${p.h},100%,85%,${Math.min(1,p.l*1.6)})`;x.fillRect(p.x|0,(p.y|0)-1,1,3);x.fillRect((p.x|0)-1,p.y|0,3,1)});
 }
 function tagContent(){const t=$("#petTag");if(!aqSel){t.hidden=true;return}t.hidden=false;t.innerHTML="<b></b><small></small>";t.firstChild.textContent=nameOf(aqSel.f);t.lastChild.textContent=aqSel.f.w+" kg";tagPos()}
 function tagPos(){const t=$("#petTag");if(!aqSel){t.hidden=true;return}t.style.left=Math.max(12,Math.min(88,aqSel.x/AW*100))+"%";t.style.top=Math.max(14,(aqSel.y-aqSel.sp.Ht/2-3)/AH*100)+"%"}
-function aquaLoop(n){if(view!=="aqua"){aqRun=false;return}const dt=Math.min(.05,(n-aqLast)/1000);aqLast=n;aquaStep(dt);aquaDraw();requestAnimationFrame(aquaLoop)}
+function aquaLoop(n){if(view!=="aqua"){aqRun=false;return}if(n-(aquaLoop.u||0)>1000){aquaLoop.u=n;tipsUpdate()}const dt=Math.min(.05,(n-aqLast)/1000);aqLast=n;aquaStep(dt);aquaDraw();requestAnimationFrame(aquaLoop)}
 function aquaStart(){aquaSync();if(aqRun)return;aqRun=true;aqLast=performance.now();requestAnimationFrame(aquaLoop)}
 $("#tankc").addEventListener("pointerdown",e=>{
   const r=e.currentTarget.getBoundingClientRect(),mx=(e.clientX-r.left)/r.width*AW,my=(e.clientY-r.top)/r.height*AH;let best=null,bd=1e9;
   AQ.forEach(a=>{const dx=Math.abs(mx-a.x),dy=Math.abs(my-a.y);if(dx<=a.sp.W/2+4&&dy<=a.sp.Ht/2+4){const d=dx*dx+dy*dy;if(d<bd){bd=d;best=a}}});
   aqSel=best;if(best){best.pause=3.5;aqSelT=4;bubble(best.x,best.y-3);play("tick")}tagContent();
 });
+/* ---------- tanks, decorations, feeding, tips, breeding ---------- */
+const TANKS=[{theme:"classic",n:"Classic tank",cost:0,filter:"none"},{theme:"marsh",n:"Bayou tank",cost:8000,filter:"sepia(.55) hue-rotate(-18deg) saturate(1.5)"},{theme:"frost",n:"Frost tank",cost:25000,filter:"hue-rotate(18deg) saturate(.55) brightness(1.18)"},{theme:"cavern",n:"Cavern tank",cost:70000,filter:"hue-rotate(205deg) saturate(1.4) brightness(.8)"}];
+const DECOR={coral:{n:"Coral cluster",cost:300,pts:3,x:52,e:"🌿"},anchor:{n:"Old anchor",cost:600,pts:4,x:96,e:"⚓"},bubbler:{n:"Bubble stone",cost:900,pts:5,x:140,e:"💧"},chest:{n:"Treasure chest",cost:1500,pts:6,x:184,e:"🧰"},lamp:{n:"Glow lamp",cost:3000,pts:8,x:228,e:"💡"},castle:{n:"Sunken castle",cost:6000,pts:10,x:266,e:"🏰"}};
+const FPT=[1,1,2,2,4,7,12,20,100],HRS=3600000;
+let par=[];
+const tk=()=>S.tanks[S.tk];
+const hyTag=f=>f&&f.hy?' <span class="tag hy">Hybrid</span>':'';
+const hm=ms=>{const h=Math.floor(ms/HRS),m=Math.max(1,Math.ceil(ms%HRS/60000));return h?h+"h "+m+"m":m+"m"};
+function appeal(t){const sp=new Set(),st=new Set();let a=0;
+  t.fish.forEach(f=>{const q=fi(f.id);a+=FPT[q.a]+(f.hy?2:0)+(f.pet?1:0)+(f.w0?Math.floor((f.w/f.w0-1)*10):0);sp.add(q.s);st.add(q.m)});
+  return a+sp.size+st.size+t.decor.reduce((x,id)=>x+DECOR[id].pts,0)}
+const tipRate=t=>appeal(t)*10;   // shunk per hour
+const tipsPending=t=>Math.floor(Math.min(8*HRS,Date.now()-t.t)/HRS*tipRate(t));
+function tipsUpdate(){const t=tk();if(!t)return;$("#tankStats").innerHTML=`<b>Appeal ${appeal(t)}</b> · visitors tip about <b>${tipRate(t).toLocaleString()} shunk an hour</b>. Waiting now: <b>${tipsPending(t).toLocaleString()} shunk</b> <span class="muted">(fills for up to 8 hours)</span>`;$("#collect").disabled=tipsPending(t)<1}
+function growFish(f){if(!f.w0){f.w0=f.w;f.p0=f.p}f.w=+Math.min(f.w0*1.6,f.w+f.w0*.025).toFixed(2);f.p=Math.max(1,Math.round(f.p0*f.w/f.w0));f.ate=(f.ate||0)+1;if(f.ate>=3){f.ate=0;f.full=Date.now()+20*60000}}
+function eatPellet(a){growFish(a.f);a.sp=spriteFor(a.f);a.L=a.sp.L;play("tick");for(let i=0;i<3;i++)SPK.push({x:a.x+(R()-.5)*a.sp.W,y:a.y-a.sp.Ht/2-R()*4,l:.8,h:340});save()}
+function chestOpen(){return(performance.now()/1000)%7<1.6}
+function drawScenery(x){
+  const B=AB.y1+4,t=performance.now()/1000,T=tk();
+  T.decor.forEach(id=>{const cx=DECOR[id].x;
+    if(id==="coral"){["#e86f8f","#f2a35b","#e0527a","#f7b0c0"].forEach((c,i)=>{const dx=[-6,-2,3,7][i],h=[10,16,12,8][i];x.fillStyle=c;x.fillRect(cx+dx,B-h,3,h);x.fillRect(cx+dx-2,B-h-2+i%2,2,2);x.fillRect(cx+dx+3,B-h+1,2,2)})}
+    if(id==="anchor"){x.fillStyle="#7d8b94";x.fillRect(cx-1,B-20,3,19);x.fillRect(cx-6,B-17,13,2);x.fillStyle="#5d6b74";x.fillRect(cx-8,B-5,3,4);x.fillRect(cx+6,B-5,3,4);x.fillRect(cx-6,B-2,13,2);x.fillStyle="#6f9a55";x.fillRect(cx-1,B-8,3,2)}
+    if(id==="bubbler"){x.fillStyle="#6c7780";x.fillRect(cx-7,B-6,15,6);x.fillStyle="#8a95a0";x.fillRect(cx-5,B-8,10,3);x.fillStyle="#4d5860";x.fillRect(cx-1,B-9,3,2)}
+    if(id==="chest"){const o=chestOpen();x.fillStyle="#8a5a2c";x.fillRect(cx-9,B-9,18,9);x.fillStyle="#e0b030";x.fillRect(cx-9,B-5,18,2);x.fillRect(cx-1,B-7,3,4);
+      if(o){x.fillStyle="#6b4420";x.fillRect(cx-9,B-18,18,4);x.fillStyle="#ffd25a";x.fillRect(cx-7,B-11,14,2);if(Math.sin(t*14)>0){x.fillStyle="#fff7c8";x.fillRect(cx-5,B-13,1,1);x.fillRect(cx+3,B-14,1,1)}}else{x.fillStyle="#6b4420";x.fillRect(cx-9,B-13,18,4)}}
+    if(id==="lamp"){x.fillStyle="#4a3a2a";x.fillRect(cx-1,B-26,3,25);x.fillStyle="#ffd25a";x.fillRect(cx-3,B-31,7,7);x.fillStyle="#fff3b0";x.fillRect(cx-1,B-29,3,3);
+      x.globalCompositeOperation="lighter";const g=x.createRadialGradient(cx,B-28,2,cx,B-28,30);const a=.34+.08*Math.sin(t*2);g.addColorStop(0,`rgba(255,210,100,${a})`);g.addColorStop(1,"rgba(255,210,100,0)");x.fillStyle=g;x.fillRect(cx-32,B-60,64,64);x.globalCompositeOperation="source-over"}
+    if(id==="castle"){x.fillStyle="#c9b27a";x.fillRect(cx-16,B-14,32,14);x.fillRect(cx-18,B-26,9,26);x.fillRect(cx+9,B-30,9,30);x.fillStyle="#b39b64";for(let k=0;k<3;k++){x.fillRect(cx-18+k*4,B-29,3,3);x.fillRect(cx+9+k*4,B-33,3,3)}
+      x.fillStyle="#3a2e1c";x.fillRect(cx-14,B-22,3,5);x.fillRect(cx+12,B-24,3,5);x.fillRect(cx-3,B-9,7,9);x.fillStyle="#d0392e";x.fillRect(cx+13,B-38,1,5);x.fillRect(cx+14,B-38,5,3)}
+  });
+  if(T.eggs.length){const e=T.eggs[0],ready=Date.now()>=e.ready,px=160,py=B-4;x.fillStyle=ready?"#fff1b0":"#d9d2b0";x.fillRect(px-3,py-6,7,8);x.fillRect(px-2,py-8,5,2);x.fillStyle="#a89a70";x.fillRect(px-1,py-3,1,1);x.fillRect(px+2,py-5,1,1);
+    if(ready&&Math.sin(t*6)>0){x.fillStyle="#fff";x.fillRect(px-5,py-9,1,1);x.fillRect(px+5,py-4,1,1)}}
+}
+function canBreed(f){return f&&f.id!==DEV&&(f.rest||0)<Date.now()}
+function startBreed(){
+  const t=tk();if(par.length!==2)return toast("Pick two parents first.");const[a,b]=par.map(i=>S.aq[i]);
+  if(!a||!b)return;if(!canBreed(a)||!canBreed(b))return toast("A parent is still resting.");if(t.eggs.length)return toast("This tank already has an egg.");
+  const c=150+100*(fi(a.id).a+fi(b.id).a);if(S.shunk<c)return toast("Breeding costs "+c.toLocaleString()+" shunk.");
+  S.shunk-=c;const qa=fi(a.id),qb=fi(b.id),pk=(x,y)=>Math.random()<.5?x:y,mut=Math.random()<.2;
+  let v=pk(qa.v,qb.v);if(mut)v=Math.min(7,(v/10|0)+1)*10+Math.floor(Math.random()*10);
+  const s=Math.random()<.05?Math.floor(Math.random()*NSP):pk(qa.s,qb.s),m=Math.random()<.1?Math.floor(Math.random()*8):pk(qa.m,qb.m);
+  const w=Math.max(.02,+((a.w+b.w)/2*(.85+Math.random()*.5)*(mut?1.15:1)).toFixed(2));
+  t.eggs.push({ready:Date.now()+4*HRS,id:(v*NSP+s)*NM+m,w,mut});a.rest=b.rest=Date.now()+12*HRS;par=[];play("coin");save();render();toast("An egg is incubating. It hatches in 4 hours.")}
+function hatchEgg(){
+  const t=tk(),e=t.eggs[0];if(!e||Date.now()<e.ready)return;t.eggs.shift();
+  const q=fi(e.id),f={id:e.id,w:e.w,p:Math.max(1,Math.round(e.w*SP[q.s][3]*ADJ[q.a][2]*PM*1.25)),hy:1};S.bag.push(f);S.hybrids=(S.hybrids||0)+1;play("golden");save();render();
+  const fr=spriteFor(f).frames[1],c=document.createElement("canvas");c.width=fr.width;c.height=fr.height;c.getContext("2d").drawImage(fr,0,0);c.style.cssText="height:64px;image-rendering:pixelated";
+  modal("A hybrid hatched!","<div id='hatchSpr' style='text-align:center;margin-bottom:6px'></div><p><b>"+esc(fname(f.id))+"</b> <span class='tag' style='background:"+RC[q.a]+"'>"+RAR[q.a]+"</span> <span class='tag hy'>Hybrid</span></p><p>"+f.w+" kg, worth "+f.p.toLocaleString()+" shunk."+(e.mut?" <b>A mutation! It hatched a rarity higher.</b>":"")+"</p><p class='muted'>It is in your bag. Put it in a tank or sell it.</p>",[["Wonderful",null,1]],e.mut?"gold":"");
+  $("#hatchSpr").appendChild(c)}
+$("#collect").onclick=()=>{const t=tk(),n=tipsPending(t);if(n<1)return;S.shunk+=n;t.t=Date.now();play("coin");save();render();toast("Visitors left "+n.toLocaleString()+" shunk in the tip jar.")};
+$("#feed").onclick=()=>{
+  if(!S.aq.length)return toast("Put a fish in the tank first.");if(!(S.items.food>0))return toast("No fish food. Buy some in the Shop, or earn it from orders.");
+  if(S.aq.every(f=>(f.full||0)>Date.now()))return toast("Everyone is full. Try again later.");
+  S.items.food--;for(let i=0;i<8;i++)PEL.push({x:AB.x0+20+R()*(AB.x1-AB.x0-40),y:AB.y0+2-R()*10,vy:12+R()*8,life:9});play("tick");save();render()};
 function aquaRender(){
-  S.aq=S.aq||[];$("#aqN").textContent="("+S.aq.length+" / 5)";
+  const t=tk(),T=TANKS.find(x=>x.theme===t.theme)||TANKS[0];$("#tank img").style.filter=T.filter;
+  $("#tankTabs").innerHTML=S.tanks.map((x,i)=>`<button class="chip ${i===S.tk?"on":""}" data-tk="${i}">${(TANKS.find(y=>y.theme===x.theme)||TANKS[0]).n}</button>`).join("")+(S.tanks.length<TANKS.length?`<button class="chip" data-buytank="1">+ ${TANKS[S.tanks.length].n} (${TANKS[S.tanks.length].cost.toLocaleString()})</button>`:"");
+  $("#aqN").textContent="("+S.aq.length+" / 5)";par=par.filter(i=>S.aq[i]);
   const foc=document.activeElement;
   if(!(foc&&foc.classList&&foc.classList.contains("pet"))){
-    $("#aqList").innerHTML=S.aq.length?S.aq.map((f,i)=>{const q=fi(f.id);return `<div class="row"><span style="font-size:24px">${fem(f.id)}</span><span class="n"><b>${esc(nameOf(f))}</b> <span class="tag" style="background:${RC[q.a]}">${RAR[q.a]}</span><br><span class="muted">${f.pet?esc(fname(f.id))+", ":""}${f.w} kg</span><br><input class="pet" data-pet="${i}" maxlength="16" placeholder="Give it a pet name" value="${esc(f.pet||"")}" aria-label="Pet name"></span><button data-aqout="${i}">Back to bag</button></div>`}).join(""):'<p class="muted">Your aquarium is empty. Put a fish from your bag in it.</p>';
+    $("#aqList").innerHTML=S.aq.length?S.aq.map((f,i)=>{const q=fi(f.id),now=Date.now(),rest=(f.rest||0)>now;return `<div class="row"><span style="font-size:24px">${fem(f.id)}</span><span class="n"><b>${esc(nameOf(f))}</b> <span class="tag" style="background:${RC[q.a]}">${RAR[q.a]}</span>${hyTag(f)}<br><span class="muted">${f.pet?esc(fname(f.id))+", ":""}${f.w} kg${f.w0?" (+"+Math.round((f.w/f.w0-1)*100)+"% grown)":""}<br>${(f.full||0)>now?"Full for "+hm(f.full-now):"Hungry"}${rest?", resting "+hm(f.rest-now):""}</span><br><input class="pet" data-pet="${i}" maxlength="16" placeholder="Give it a pet name" value="${esc(f.pet||"")}" aria-label="Pet name"></span><span class="btns"><button data-par="${i}" class="${par.includes(i)?"on":""}" ${f.id===DEV?"disabled":""}>${par.includes(i)?"✓ Parent":"Parent"}</button><button data-aqout="${i}">To bag</button></span></div>`}).join(""):'<p class="muted">This tank is empty. Put a fish from your bag in it.</p>';
   }
-  $("#aqBag").innerHTML=S.bag.length?S.bag.map((f,i)=>`<div class="row"><span style="font-size:24px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))}<br><span class="muted">${f.w} kg</span></span><button data-aqadd="${i}" ${S.aq.length>=5?"disabled":""}>Put in tank</button></div>`).join(""):'<p class="muted">Your bag is empty.</p>';
-  aquaSync();
+  const eg=t.eggs[0],a=S.aq[par[0]],b=S.aq[par[1]];
+  $("#breedBox").innerHTML=`<p class="muted" style="margin:0 0 8px">Pick two parents with the Parent button. Their baby is a Hybrid that mixes their variant, species and strain, and sometimes mutates into a higher rarity. Hybrids do not count toward the dex.</p>
+    <p style="margin:0 0 8px">${a&&b?`<b>${esc(nameOf(a))}</b> + <b>${esc(nameOf(b))}</b><br><span class="muted">Costs ${(150+100*(fi(a.id).a+fi(b.id).a)).toLocaleString()} shunk. Hatches in 4 hours. Parents rest for 12 hours.</span>`:'<span class="muted">No parents chosen yet.</span>'}</p>
+    <button data-breed="1" ${a&&b&&!eg?"":"disabled"}>Start breeding</button>
+    ${eg?`<p style="margin:10px 0 6px"><b>🥚 An egg is incubating.</b> ${Date.now()>=eg.ready?"It is ready!":"Ready in "+hm(eg.ready-Date.now())+"."}</p><button data-hatch="1" ${Date.now()>=eg.ready?"":"disabled"}>Hatch the egg</button>`:""}`;
+  $("#decorList").innerHTML=Object.keys(DECOR).map(id=>{const D=DECOR[id],own=t.decor.includes(id);return `<div class="row"><span style="font-size:24px">${D.e}</span><span class="n"><b>${D.n}</b><br><span class="muted">+${D.pts} appeal</span></span>${own?'<span class="tag" style="background:#3f9a2c">In tank</span>':`<button data-deco="${id}" ${S.shunk<D.cost?"disabled":""}>Buy · ${D.cost.toLocaleString()}</button>`}</div>`}).join("");
+  $("#aqBag").innerHTML=S.bag.length?S.bag.map((f,i)=>`<div class="row"><span style="font-size:24px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))}${hyTag(f)}<br><span class="muted">${f.w} kg</span></span><button data-aqadd="${i}" ${S.aq.length>=5?"disabled":""}>Put in tank</button></div>`).join(""):'<p class="muted">Your bag is empty.</p>';
+  $("#feed").textContent="Feed fish ("+(S.items.food||0)+")";tipsUpdate();aquaSync();
 }
 document.addEventListener("change",e=>{const t=e.target;if(!(t.classList&&t.classList.contains("pet")))return;
   const f=S.aq[+t.dataset.pet];if(!f)return;const v=t.value.trim().slice(0,16);if(v)f.pet=v;else delete f.pet;
@@ -717,7 +888,7 @@ function reelTo(i,d,dur){const s=strips[i],cur=+s.dataset.cur||0;
 [1,0,0].forEach((d,i)=>reelSet(i,d));
 function fortRender(){
   if(fobj&&!S.bag.includes(fobj))fobj=null;
-  $("#fortList").innerHTML=S.bag.length?S.bag.map((f,i)=>{const q=fi(f.id);return `<div class="row ${f===fobj?"sel":""}"><span style="font-size:26px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))} <span class="tag" style="background:${RC[q.a]}">${RAR[q.a]}</span><br><span class="muted">${f.w} kg, worth ${f.p.toLocaleString()} shunk</span></span>${f.id===DEV?'<button disabled>No gambling</button>':`<button data-fort="${i}" ${spinning?"disabled":""}>${f===fobj?"Selected":"Choose"}</button>`}</div>`}).join(""):'<p class="muted">Your bag is empty. Catch a fish first.</p>';
+  $("#fortList").innerHTML=S.bag.length?S.bag.map((f,i)=>{const q=fi(f.id);return `<div class="row ${f===fobj?"sel":""}"><span style="font-size:26px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))} <span class="tag" style="background:${RC[q.a]}">${RAR[q.a]}</span>${hyTag(f)}<br><span class="muted">${f.w} kg, worth ${f.p.toLocaleString()} shunk</span></span>${f.id===DEV?'<button disabled>No gambling</button>':`<button data-fort="${i}" ${spinning?"disabled":""}>${f===fobj?"Selected":"Choose"}</button>`}</div>`}).join(""):'<p class="muted">Your bag is empty. Catch a fish first.</p>';
   $("#spin").disabled=!fobj||spinning;
   const key=fobj?fobj.id+"|"+fobj.w+"|"+fobj.p:"";
   if(key!==fortKey){fortKey=key;const c=$("#fortSpr"),x=c.getContext("2d");
@@ -744,6 +915,46 @@ function spin(){
 }
 $("#spin").onclick=spin;$("#lever").onclick=spin;$("#lever").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();spin()}});
 
+/* ---------- harbor orders ---------- */
+function rngSeed(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return((h^=h>>>16)>>>0)/4294967296}}
+function genOrder(day,idx,rr){
+  const r=rngSeed(day+"|"+idx+"|"+rr),pick=a=>a[Math.floor(r()*a.length)],U=LAKES.filter(l=>S.lakes[l.id]);
+  const strains=[0,1,2,3,...U.map(l=>4+LAKES.indexOf(l))],favs=[...new Set(U.filter(l=>l.id!=="pond").flatMap(l=>l.fi))];
+  const prog=1+.15*((S.up.reel||0)+(S.up.line||0)+(S.up.lure||0)),o={idx,diff:[1,1,2,3][idx]};
+  if(idx===0){if(r()<.5)o.w=Math.round(5+r()*8);else o.m=pick(strains);o.sh=60+Math.round(r()*30)}
+  else if(idx===1){if(r()<.5)o.a=2;else{o.m=pick(strains);o.w=Math.round(3+r()*5)}o.sh=110+Math.round(r()*40)}
+  else if(idx===2){if(favs.length&&r()<.6)o.s=pick(favs);else o.a=3+Math.floor(r()*2);o.sh=220+Math.round(r()*80)}
+  else{const k=r();if(favs.length&&k<.4){o.s=pick(favs);o.m=pick(strains)}else if(k<.75){o.a=4;o.w=Math.round(10+r()*15)}else o.a=5;o.sh=480+Math.round(r()*200)}
+  o.sh=Math.round(o.sh*prog/5)*5;
+  const q=r();o.item=idx>=2?(q<.5?["food",3+idx]:["bait",pick(["cricket","shrimp"]),3+idx]):(q<.35?["food",2]:null);
+  return o}
+function newOrders(d){S.orders={day:d,chest:false,list:[0,1,2,3].map(i=>({...genOrder(d,i,0),rr:0,done:false}))}}
+function okf(o,f){if(!f||f.id===DEV)return false;const q=fi(f.id);return(o.w==null||f.w>=o.w)&&(o.m==null||q.m===o.m)&&(o.a==null||q.a>=o.a)&&(o.s==null||q.s===o.s)}
+function orderText(o){const adj=[];if(o.a!=null)adj.push(["","","Uncommon","Uncommon","Rare","Epic","Legendary","Mythic"][o.a]+" or better");if(o.m!=null)adj.push(MARKS[o.m]+" strain");
+  const noun=o.s!=null?SP[o.s][0]:"fish",first=adj.length?adj[0]:noun;return "Bring "+(/^[aeiou]/i.test(first)?"an":"a")+(adj.length?" "+adj.join(", "):"")+" "+noun+(o.w?" of at least "+o.w+" kg":"")+"."}
+function itemText(o){return !o.item?"":o.item[0]==="food"?" + "+o.item[1]+" fish food":" + "+o.item[2]+" "+BAITS.find(b=>b.id===o.item[1]).n}
+function deliver(oi,bi){
+  const o=S.orders.list[oi],f=S.bag[bi];if(!o||o.done||!okf(o,f))return;
+  S.bag.splice(bi,1);S.shunk+=o.sh;
+  if(o.item){if(o.item[0]==="food")S.items.food=(S.items.food||0)+o.item[1];else addBait(o.item[1],o.item[2])}
+  o.done=true;S.ordTotal=(S.ordTotal||0)+1;play("record");
+  toast("Order delivered: +"+o.sh+" shunk"+itemText(o));
+  if(S.orders.list.every(x=>x.done)&&!S.orders.chest){
+    S.orders.chest=true;const yday=new Date(Date.now()-864e5).toDateString();
+    S.ordStreak=S.ordLast===yday?(S.ordStreak||0)+1:1;S.ordLast=S.orders.day;
+    const bonus=Math.round(300*(1+Math.min(.5,.1*(S.ordStreak-1))));S.shunk+=bonus;S.items.food=(S.items.food||0)+3;addBait("shrimp",5);
+    setTimeout(()=>{play("golden");modal("All orders done!","<p>The harbor master sends a chest:</p><p><b>+"+bonus+" shunk, +3 fish food, +5 shrimp</b></p><p class='muted'>Streak: "+S.ordStreak+" day"+(S.ordStreak>1?"s":"")+(S.ordStreak>1?" (bonus +"+Math.min(50,10*(S.ordStreak-1))+"%)":"")+". Come back tomorrow to keep it going.</p>",[["Wonderful",null,1]],"gold")},700)}
+  save();render();
+}
+function ordersRender(){
+  const d=new Date().toDateString();if(!S.orders||S.orders.day!==d)return;
+  const L=S.orders.list,ready=L.filter(o=>!o.done&&S.bag.some(f=>okf(o,f))).length;
+  $("#ordN").textContent=ready?" ("+ready+")":"";
+  const n=new Date(),ms=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1)-n,h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);
+  $("#ordInfo").textContent="New orders in "+h+"h "+m+"m. Done today: "+L.filter(o=>o.done).length+" of "+L.length+". Finish all four for a chest. Streak: "+(S.ordLast===d||S.ordLast===new Date(Date.now()-864e5).toDateString()?(S.ordStreak||0):0)+" day"+((S.ordStreak||0)===1?"":"s")+".";
+  $("#ordList").innerHTML=L.map((o,i)=>{const n=S.bag.filter(f=>okf(o,f)).length;return `<div class="item ord ${o.done?"done":""}"><span class="tag" style="background:${["","#3f9a2c","#2f78c8","#d0392e"][o.diff]}">${["","Easy","Medium","Hard"][o.diff]}</span><p style="margin:6px 0">${esc(orderText(o))}</p><p class="muted" style="margin:0 0 8px">Reward: <b>${o.sh} shunk</b>${esc(itemText(o))}</p>${o.done?'<b style="color:#2f7a22">Delivered</b>':`<button data-od="${i}" ${n?"":"disabled"}>${n?"Deliver ("+n+" match"+(n>1?"es":"")+")":"No match in bag"}</button> <button data-rr="${i}" ${S.shunk<50*(o.rr+1)?"disabled":""}>New order · ${50*(o.rr+1)}</button>`}</div>`}).join("");
+}
+
 /* ---------- save code / reset ---------- */
 function showCode(code){modal("Your save code",'<p class="muted">Copy all of this text and keep it somewhere safe.</p><textarea readonly id="codeBox"></textarea>',[["Close",null,1]]);$("#codeBox").value=code;$("#codeBox").select()}
 $("#expSave").onclick=()=>{const code=btoa(unescape(encodeURIComponent(JSON.stringify(S))));
@@ -752,7 +963,8 @@ $("#impSave").onclick=()=>modal("Load a save code",'<p class="muted">Paste a sav
 $("#resetGame").onclick=()=>ask("Reset the whole game?","<p>This deletes all your fish, shunk, baits and progress. It cannot be undone.</p>","Reset everything",()=>{try{localStorage.removeItem(KEY)}catch(e){}location.reload()});
 
 /* ---------- start ---------- */
-muteLab();daily();setInterval(()=>{daily();if(S.time==="auto"&&st!=="wait"&&st!=="reel")applyScene();render()},60000);render();applyScene();if(S.sacActive)devFail(true);
+muteLab();daily();setInterval(()=>{daily();if(st!=="wait"&&st!=="reel")applyScene();render()},60000);render();applyScene();if(S.sacActive)devFail(true);
+if(window.__refund!==undefined){modal("Shunk Pond was rebalanced","<p>Fish are worth less and better bait now pays off properly, so every shunk matters. Your bait box holds up to 50 of each bait (upgradable in the Workshop)."+(window.__refund>0?"</p><p>Your extra bait was bought back: <b>+"+window.__refund.toLocaleString()+" shunk</b>.":"")+"</p><p class='muted'>New in the Shop: rod upgrades and fish food.</p>",[["Let's fish",null,1]])}
 </script>
 </body>
 </html>
