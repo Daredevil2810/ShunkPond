@@ -118,6 +118,8 @@ input[type=number]{font:inherit;width:110px;padding:6px;border:3px solid var(--w
 #stage{touch-action:none;-webkit-touch-callout:none}
 body{overscroll-behavior-y:contain}
 @media(prefers-reduced-motion:reduce){#stage.dev{animation:none}}
+#diveWrap{position:relative;border:5px solid var(--wood2);box-shadow:0 5px 0 #24130a;background:#000;line-height:0}
+#divec{width:100%;display:block;aspect-ratio:9/5;image-rendering:pixelated;touch-action:none;cursor:crosshair}
 /* slot machine */
 #mach{max-width:520px;margin:14px auto 4px;background:linear-gradient(#b0382e,#7c1f1a);border:6px solid #3a0f0c;box-shadow:0 6px 0 #1d0806,inset 0 0 0 4px #f6b73c;padding:16px 14px;color:#fff}
 .marq{display:flex;align-items:center;justify-content:center;gap:8px;background:#2a0a08;border:4px solid #f6b73c;padding:6px;margin-bottom:12px}
@@ -153,6 +155,8 @@ body{overscroll-behavior-y:contain}
 #tank{position:relative;border:5px solid var(--wood2);box-shadow:0 5px 0 #24130a;background:#000;line-height:0;overflow:hidden}
 #tank img{width:100%;display:block;aspect-ratio:1672/941;image-rendering:auto}
 #tankc{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;cursor:pointer;touch-action:manipulation}
+#tankc.clean{touch-action:none;cursor:grab}
+#tank img{transition:filter 1s}
 #petTag{position:absolute;transform:translate(-50%,-100%);background:var(--paper);border:3px solid var(--wood2);padding:3px 9px;line-height:1.15;text-align:center;white-space:nowrap;pointer-events:none;max-width:90%;font-size:15px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
 #petTag small{display:block;opacity:.7;font-size:12px}
 .agrid{display:grid;grid-template-columns:1fr;gap:0 14px}
@@ -201,7 +205,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 <header>
   <h1>Shunk Pond</h1>
   <nav id="nav">
-    <button data-v="fish" class="on">Fish</button><button data-v="shop">Shop</button><button data-v="orders">Orders<span id="ordN"></span></button><button data-v="bag">Bag <span id="bagN"></span></button><button data-v="aqua">Tank</button><button data-v="race" data-g="race,fort">Games</button>
+    <button data-v="fish" class="on">Fish</button><button data-v="shop">Shop</button><button data-v="orders">Orders<span id="ordN"></span></button><button data-v="bag">Bag <span id="bagN"></span></button><button data-v="aqua">Tank</button><button data-v="race" data-g="race,fort,dive">Games</button>
   </nav>
   <div class="hr"><button id="mute" aria-label="Toggle sound">Sound on</button>
   <div class="coin"><i></i><span id="money">0</span> shunk</div></div>
@@ -230,13 +234,25 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 </section>
 
 <section id="v-shop" hidden>
-  <div class="panel"><h2>Bait shop</h2><p class="muted">You get 2 free worms every new day. Better bait means better odds of rare, heavy fish. Your bait box has a limit, so spend or upgrade it.</p><div class="grid" id="shopGrid"></div></div>
+  <div class="panel"><h2>Bait shop</h2><p class="muted">You get 2 free worms every new day. Better bait means better odds of rare, heavy fish. Your bait box has a limit, so spend or upgrade it. "Fill box" buys as many as fit in the box and as you can afford, and the price on the button is what it will cost.</p><div class="grid" id="shopGrid"></div></div>
   <div class="panel"><h2>Workshop</h2><p class="muted">Upgrade your gear. Heavier fish need a stronger line, or the fight gets harder.</p><div class="grid" id="workshop"></div></div>
   <div class="panel"><h2>Supplies</h2><div class="grid" id="supplies"></div></div>
 </section>
 
 <section id="v-orders" hidden>
   <div class="panel"><h2>Harbor orders</h2><p class="muted" id="ordInfo" style="margin:0 0 10px"></p><div class="grid" id="ordList"></div></div>
+</section>
+
+<section id="v-dive" hidden>
+  <div class="subnav"><button data-v="race">Seahorse races</button><button data-v="fort">Fortune machine</button><button data-v="dive" class="on">Pearl dive</button></div>
+  <div class="panel"><h2>Pearl dive <span id="pearlN" class="muted"></span></h2>
+    <p class="muted" style="margin:0 0 8px">Swim through the reef. Touch and drag (or use the arrow keys) to move. Grab pearls, catch air bubbles, and dodge jellyfish, urchins and eels. Deeper zones pay more.</p>
+    <div class="ctl" id="zoneChips" style="margin-bottom:8px"></div>
+    <div id="diveWrap"><canvas id="divec" width="360" height="200"></canvas></div>
+    <div class="ctl" style="margin-top:8px"><button id="diveGo" style="background:var(--gold)">Start dive</button><button id="diveEnd" hidden>Surface now</button><span class="muted" id="diveStats"></span></div>
+  </div>
+  <div class="panel"><h2>Pearl shop</h2><div class="grid" id="pearlShop"></div></div>
+  <div class="panel"><h2>Dive gear</h2><div class="grid" id="diveGear"></div></div>
 </section>
 
 <section id="v-bag" hidden>
@@ -246,12 +262,13 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
     <h2 style="margin-top:14px">Species found</h2><div class="dex" id="dex"></div>
     <h2 style="margin-top:14px">Latest discoveries</h2><div id="dexRecent"></div></div>
   <div class="panel"><h2>Your game</h2><p class="muted" id="stats"></p>
-    <div class="ctl"><button id="expSave">Copy save code</button><button id="impSave">Load save code</button><button id="resetGame">Reset game</button></div>
+    <div class="ctl" style="gap:14px"><label class="muted">Sound effects <input type="range" id="sfxVol" min="0" max="100" aria-label="Sound effects volume"></label><label class="muted">Ambience <input type="range" id="ambVol" min="0" max="100" aria-label="Ambience volume"></label></div>
+    <div class="ctl" style="margin-top:8px"><button id="expSave">Copy save code</button><button id="impSave">Load save code</button><button id="resetGame">Reset game</button></div>
     <p class="muted" style="margin:8px 0 0">Progress is saved in this browser. Copy a save code to back it up or move to another device.</p></div>
 </section>
 
 <section id="v-fort" hidden>
-  <div class="subnav"><button data-v="race">Seahorse races</button><button data-v="fort" class="on">Fortune machine</button></div>
+  <div class="subnav"><button data-v="race">Seahorse races</button><button data-v="fort" class="on">Fortune machine</button><button data-v="dive">Pearl dive</button></div>
   <div class="panel"><h2>Fortune machine</h2>
     <p class="muted" style="margin:0">Choose a fish below, then pull the lever or press SPIN. The reels land on a random multiplier from x0.50 to x1.50, and every value is equally likely, so on average you break even. Your fish's weight and price change by that multiplier. Only the fish you choose is at stake.</p>
     <div id="mach">
@@ -270,7 +287,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
   <div class="ctl" id="tankTabs" style="margin-bottom:8px"></div>
   <div id="tankwrap"><div id="tank"><img src="assets/aquarium.webp" onerror="this.onerror=null;this.src='assets/aquarium.png'" alt="A fish tank" draggable="false"><canvas id="tankc" width="320" height="180"></canvas><div id="petTag" hidden></div></div></div>
   <p class="muted" style="text-align:center;margin:8px 0 0;color:#9fc3e0">Tap a fish to see its name.</p>
-  <div class="panel"><div id="tankStats"></div><div class="ctl" style="margin-top:8px"><button id="collect">Collect tips</button><button id="feed">Feed fish</button></div></div>
+  <div class="panel"><div id="tankStats"></div><div class="ctl" style="margin-top:8px"><button id="collect">Collect tips</button><button id="feed">Feed fish</button><button id="feed2" hidden>Super food</button><button id="clean">Clean glass</button><button id="lights">Lights</button></div></div>
   <div class="agrid">
     <div>
       <div class="panel"><h2>In your aquarium <span id="aqN" class="muted"></span></h2><div id="aqList"></div></div>
@@ -284,7 +301,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
 </section>
 
 <section id="v-race" hidden>
-  <div class="subnav"><button data-v="race" class="on">Seahorse races</button><button data-v="fort">Fortune machine</button></div>
+  <div class="subnav"><button data-v="race" class="on">Seahorse races</button><button data-v="fort">Fortune machine</button><button data-v="dive">Pearl dive</button></div>
   <div class="panel"><h2>Seahorse races</h2>
     <div id="track"></div>
     <div class="picks" id="picks"></div>
@@ -365,7 +382,7 @@ function moonInfo(){const age=((Date.now()/86400000+2440587.5-2451550.26)%29.530
   return{age,name:names[Math.floor(((age+1.85)%29.53)/3.69)%8],full:age>=13.2&&age<=16.4}}
 // everything that changes luck, weight, bite speed and fight difficulty, in one place
 function fx(){const L=L_(),T=T_(),W=wxNow(),u=S.up||{};
-  return{luck:L.luck+T.luck+W.luck+(T.id==="night"&&moonInfo().full?1.2:0),size:L.size*T.size*W.size,wait:T.wait*W.wait*(1-.07*(u.lure||0)),zs:W.zs*(1+.07*(u.reel||0)),ls:1-.06*(u.line||0),hook:1900+100*(u.lure||0)}}
+  const ch=S.charm||{};return{luck:L.luck+T.luck+W.luck+(T.id==="night"&&moonInfo().full?1.2:0)+(ch.luck>0?2.5:0),size:L.size*T.size*W.size,wait:T.wait*W.wait*(1-.07*(u.lure||0))*(ch.hook>0?.65:1),zs:W.zs*(1+.07*(u.reel||0)),ls:1-.06*(u.line||0),hook:1900+100*(u.lure||0)+(ch.hook>0?400:0)}}
 function fxBuild(snow,fly,rain){const f=$("#fx");f.innerHTML="";if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;let h="";
  if(snow)for(let i=0;i<34;i++){const z=2+(R()*3|0);h+=`<i class="snow" style="left:${R()*100}%;width:${z}px;height:${z}px;animation-duration:${4+R()*5}s;animation-delay:-${R()*9}s"></i>`}
  if(rain)for(let i=0;i<46;i++)h+=`<i class="rain" style="left:${R()*115}%;animation-duration:${.6+R()*.5}s;animation-delay:-${R()*1.2}s"></i>`;
@@ -378,7 +395,8 @@ function applyScene(){
   {const v=$("#v-fish"),lp=LAMP[L.id]||LAMP.pond;v.style.setProperty("--lx",lp[0]+"%");v.style.setProperty("--ly",lp[1]+"%");setAR(AR[L.id]||1.5)}
   const W=wxNow(),mo=moonInfo();g.dataset.w=W.id;
   const k=L.id+T.id+W.id;if(applyScene.k!==k){applyScene.k=k;fxBuild(L.id==="frost",(T.id==="night"&&L.id!=="frost")||L.id==="mystic",(W.id==="rain"||W.id==="storm")&&L.id!=="mystic")}
-  $("#sceneInfo").innerHTML=`<b>${L.n}:</b> ${L.d}<br><b>${T.n}:</b> ${T.d}<br><b>Weather, ${W.n}:</b> ${W.d} <span class="muted">(changes in ${wxLeft()})</span><br><b>Moon, ${mo.name}:</b> ${mo.full?(T.id==="night"?"Rare fish are stirring tonight!":"Rare fish stir on moonlit nights."):"No moon bonus."}`;
+  $("#sceneInfo").innerHTML=`<b>${L.n}:</b> ${L.d}<br><b>${T.n}:</b> ${T.d}<br><b>Weather, ${W.n}:</b> ${W.d} <span class="muted">(changes in ${wxLeft()})</span><br><b>Moon, ${mo.name}:</b> ${mo.full?(T.id==="night"?"Rare fish are stirring tonight!":"Rare fish stir on moonlit nights."):"No moon bonus."}${(S.charm.luck>0||S.charm.hook>0)?"<br><b>Charms:</b> "+(S.charm.luck>0?"Lucky x"+S.charm.luck+" ":"")+(S.charm.hook>0?"Quick hook x"+S.charm.hook:""):""}`;
+  ambApply();
 }
 function sceneChips(){
   $("#lakeChips").innerHTML='<span class="muted">Lake</span>'+LAKES.map(l=>`<button class="chip ${S.lake===l.id?"on":""}" data-lake="${l.id}">${S.lakes[l.id]?"":"🔒 "}${l.n}${S.lakes[l.id]?"":" ("+l.cost+")"}</button>`).join("");
@@ -399,6 +417,7 @@ try{const raw=JSON.parse(localStorage.getItem(KEY)||"{}");
     const sc=f=>{if(f.id!==DEV)f.p=Math.max(1,Math.round(f.p*PM))};(raw.bag||[]).forEach(sc);(raw.aq||[]).forEach(sc);
     raw.tanks=[{theme:"classic",fish:raw.aq||[],decor:[],eggs:[],t:Date.now()}];delete raw.aq;raw.tk=0;raw.v=3;window.__refund=refund}
   Object.assign(S,raw)}catch(e){}
+S.pearls=S.pearls||0;if(!S.charm)S.charm={luck:0,hook:0};if(!S.dg)S.dg={o2:0,fin:0,mag:0};if(!S.dive)S.dive={count:0,best:{}};
 if(!S.up)S.up={};["reel","line","lure","box"].forEach(k=>{S.up[k]=S.up[k]||0});if(!S.items)S.items={food:0};
 if(!S.tanks||!S.tanks.length)S.tanks=[{theme:"classic",fish:[],decor:[],eggs:[],t:Date.now()}];if(!S.tanks[S.tk])S.tk=0;
 delete S.aq;Object.defineProperty(S,"aq",{get(){return S.tanks[S.tk].fish},enumerable:false,configurable:true});   // S.aq = fish in the tank you are looking at
@@ -411,7 +430,7 @@ function modal(title,html,btns,cls){const b=$("#mBtns");$("#mT").textContent=tit
   btns.forEach(x=>{const e=document.createElement("button");e.textContent=x[0];if(x[2])e.style.background="var(--gold)";e.onclick=()=>{$("#modal").hidden=true;if(x[1])x[1]()};b.appendChild(e)});
   $("#modal").hidden=false;if(b.lastChild)b.lastChild.focus()}
 const ask=(t,h,ok,cb)=>modal(t,h,[["Cancel"],[ok,cb,1]]);
-function setView(v){view=v;document.querySelectorAll("main>section").forEach(s=>s.hidden=s.id!=="v-"+v);document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v||(b.dataset.g||"").split(",").includes(v)));document.querySelectorAll(".subnav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo(0,0);if(v==="aqua")aquaStart()}
+function setView(v){view=v;document.querySelectorAll("main>section").forEach(s=>s.hidden=s.id!=="v-"+v);document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v||(b.dataset.g||"").split(",").includes(v)));document.querySelectorAll(".subnav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo(0,0);if(v==="aqua")aquaStart();if(v==="dive")diveStart();ambApply()}
 
 /* ---------- rendering ---------- */
 let view="fish";
@@ -427,7 +446,7 @@ function render(){
   $("#bagN").textContent=S.bag.length?"("+S.bag.length+")":"";
   sceneChips();
   $("#baitChips").innerHTML=BAITS.filter(b=>!b.special||S.baits[b.id]>0).map(b=>`<button class="chip ${S.sel===b.id?"on":""}${b.special?" sac":""}" data-bait="${b.id}">${b.e} ${b.n} x${S.baits[b.id]||0}</button>`).join("");
-  $("#shopGrid").innerHTML=BAITS.filter(b=>!b.special).map(b=>{const own=S.baits[b.id]||0,room=boxCap()-own,can=Math.min(room,Math.floor(S.shunk/b.price));return `<div class="item"><div class="e">${b.e}</div><b>${b.n}</b> <span class="muted">${own} / ${boxCap()}</span><p class="muted">${b.d}</p><button data-buy="${b.id}:1" ${room<1||S.shunk<b.price?"disabled":""}>Buy 1 · ${b.price}</button> <button data-buy="${b.id}:10" ${room<10||S.shunk<b.price*10?"disabled":""}>Buy 10 · ${b.price*10}</button> <button data-buy="${b.id}:max" ${can<1?"disabled":""}>Fill · ${can*b.price}</button></div>`}).join("");
+  $("#shopGrid").innerHTML=BAITS.filter(b=>!b.special).map(b=>{const own=S.baits[b.id]||0,room=boxCap()-own,can=Math.min(room,Math.floor(S.shunk/b.price));return `<div class="item"><div class="e">${b.e}</div><b>${b.n}</b> <span class="muted">${own} / ${boxCap()}</span><p class="muted">${b.d}</p><button data-buy="${b.id}:1" ${room<1||S.shunk<b.price?"disabled":""}>Buy 1 · ${b.price}</button> <button data-buy="${b.id}:10" ${room<10||S.shunk<b.price*10?"disabled":""}>Buy 10 · ${b.price*10}</button> <button data-buy="${b.id}:max" title="Buys as many as fit in your bait box and as you can afford" ${can<1?"disabled":""}>Fill box · ${can*b.price}</button></div>`}).join("");
   $("#workshop").innerHTML=Object.keys(UPS).map(k=>{const u=UPS[k],l=S.up[k]||0,max=u.cost.length,c=u.cost[l];return `<div class="item"><div class="e">${u.e}</div><b>${u.n}</b> <span class="muted">${"●".repeat(l)}${"○".repeat(max-l)}</span><p class="muted" style="margin:4px 0">${u.d}.<br>Now: ${l?u.fx(l):"no bonus"}${l<max?"<br>Next: "+u.fx(l+1):""}</p>${l<max?`<button data-up="${k}" ${S.shunk<c?"disabled":""}>Upgrade · ${c.toLocaleString()}</button>`:'<span class="tag" style="background:#3f9a2c">Maxed</span>'}</div>`}).join("");
   $("#supplies").innerHTML=`<div class="item"><div class="e">🍤</div><b>Fish food</b> <span class="muted">you have ${S.items.food||0}</span><p class="muted">Feed your aquarium fish and they slowly grow heavier and worth more.</p><button data-food="1" ${S.shunk<20?"disabled":""}>Buy 1 · 20</button> <button data-food="10" ${S.shunk<200?"disabled":""}>Buy 10 · 200</button></div>`;
   const tot=S.bag.reduce((a,f)=>a+(f.id===DEV?0:f.p),0);
@@ -443,11 +462,11 @@ function render(){
   $("#stats").textContent="Fish caught: "+S.caught.toLocaleString()+". Different fish discovered: "+n.toLocaleString()+".";
   $("#dex").innerHTML=SP.map((s,i)=>`<span title="${s[0]}: ${cnt[i]} of ${NV*NM} found" style="${cnt[i]?"background:#fff6dc;border-color:#3f9a2c":""}">${cnt[i]?s[1]:"?"}</span>`).join("");
   $("#dexRecent").innerHTML=(S.recent||[]).length?S.recent.map(id=>`<div class="row"><span style="font-size:22px">${fem(id)}</span><span class="n">${fname(id)}</span><span class="tag" style="background:${RC[fi(id).a]}">${RAR[fi(id).a]}</span></div>`).join(""):'<p class="muted">Nothing yet. Go fishing!</p>';
-  raceTally();fortRender();aquaRender();ordersRender();
+  raceTally();fortRender();aquaRender();ordersRender();diveRender();
   lab();
 }
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-bait],[data-buy],[data-up],[data-food],[data-od],[data-rr],[data-dv],[data-tk],[data-buytank],[data-deco],[data-par],[data-breed],[data-hatch],[data-sell],[data-v],[data-lake],[data-time],[data-fort],[data-aqadd],[data-aqout]");if(!t)return;
+  const t=e.target.closest("[data-bait],[data-buy],[data-up],[data-food],[data-od],[data-rr],[data-dv],[data-zone],[data-ps],[data-dg],[data-tk],[data-buytank],[data-deco],[data-par],[data-breed],[data-hatch],[data-sell],[data-v],[data-lake],[data-time],[data-fort],[data-aqadd],[data-aqout]");if(!t)return;
   if(t.dataset.v){setView(t.dataset.v);return}
   if(t.dataset.lake||t.dataset.time){
     if(!(st==="idle"||st==="done"))return toast("Finish this cast first.");
@@ -465,10 +484,13 @@ document.addEventListener("click",e=>{
     const k=n==="max"?Math.min(room,Math.floor(S.shunk/b.price)):Math.min(+n,room);
     if(room<1)return toast("Your bait box is full. Upgrade it in the Workshop.");if(k<1||S.shunk<k*b.price)return;
     S.shunk-=k*b.price;addBait(id,k);play("coin");save();render();toast("Bought "+k+" "+b.n+(k>1?"s":""));return}
+  if(t.dataset.zone){if(D.run)return;const z=ZONES.find(x=>x.id===t.dataset.zone);if(!S.lakes[z.lake])return toast("Unlock "+LAKES.find(l=>l.id===z.lake).n+" in the fishing screen first.");zoneSel=z.id;render();return}
+  if(t.dataset.ps){const it=PSHOP.find(x=>x.id===t.dataset.ps);if(!it)return;if(S.pearls<it.cost)return toast("You need "+it.cost+" pearls. Go diving!");S.pearls-=it.cost;it.give();play("pearl");save();render();toast("Bought "+it.n);return}
+  if(t.dataset.dg){const k=t.dataset.dg,g=DGEAR[k],l=S.dg[k]||0;if(l>=g.cost.length)return;if(S.pearls<g.cost[l])return toast("You need "+g.cost[l]+" pearls.");S.pearls-=g.cost[l];S.dg[k]=l+1;play("pearl");save();render();toast(g.n+" upgraded: "+g.fx(l+1));return}
   if(t.dataset.tk){S.tk=+t.dataset.tk;par=[];aqSel=null;tagContent();save();render();return}
   if(t.dataset.buytank){const i=S.tanks.length,T=TANKS[i];if(!T)return;if(S.shunk<T.cost)return toast("A new tank costs "+T.cost.toLocaleString()+" shunk.");
-    return ask("Buy the "+T.n+"?","<p>A second place for 5 more fish, with its own look, decorations and tips.</p><p>Costs <b>"+T.cost.toLocaleString()+" shunk</b>.</p>","Buy tank",()=>{if(S.shunk<T.cost)return;S.shunk-=T.cost;S.tanks.push({theme:T.theme,fish:[],decor:[],eggs:[],t:Date.now()});S.tk=i;par=[];play("record");save();render();toast(T.n+" is ready!")})}
-  if(t.dataset.deco){const id=t.dataset.deco,D=DECOR[id],tkk=tk();if(tkk.decor.includes(id))return;if(S.shunk<D.cost)return toast("Not enough shunk.");S.shunk-=D.cost;tkk.decor.push(id);play("coin");save();render();toast(D.n+" added to the tank.");return}
+    return ask("Buy the "+T.n+"?","<p>A second place for 5 more fish, with its own look, decorations and tips. Fish of the <b>"+MARKS[T.strain]+"</b> strain feel at home here (+2 appeal each).</p><p>Costs <b>"+T.cost.toLocaleString()+" shunk</b>.</p>","Buy tank",()=>{if(S.shunk<T.cost)return;S.shunk-=T.cost;S.tanks.push({theme:T.theme,fish:[],decor:[],eggs:[],t:Date.now()});S.tk=i;par=[];play("record");save();render();toast(T.n+" is ready!")})}
+  if(t.dataset.deco){const id=t.dataset.deco,D=DECOR[id],tkk=tk();if(tkk.decor.includes(id))return;if(D.pearls){if((S.pearls||0)<D.pearls)return toast("You need "+D.pearls+" pearls. Go diving!");S.pearls-=D.pearls}else{if(S.shunk<D.cost)return toast("Not enough shunk.");S.shunk-=D.cost}tkk.decor.push(id);play("coin");save();render();toast(D.n+" added to the tank.");return}
   if(t.dataset.par){const i=+t.dataset.par;par=par.includes(i)?par.filter(x=>x!==i):[...par,i].slice(-2);render();return}
   if(t.dataset.breed){startBreed();return}
   if(t.dataset.hatch){hatchEgg();return}
@@ -492,10 +514,12 @@ $("#sellAll").onclick=()=>{
 };
 
 /* ---------- sound (synthesised, no files needed) ---------- */
-let AC;
-function snd(f){if(S.mute)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();f(AC,AC.currentTime)}catch(e){}}
-function tone(c,t,f1,f2,d,type,v){const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v||.15,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)}
-function noise(c,t,d,f1,f2,v){const n=c.sampleRate*d|0,b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;const o=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();o.buffer=b;fl.type="bandpass";fl.Q.value=1.2;fl.frequency.setValueAtTime(f1,t);fl.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v||.2,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(fl);fl.connect(g);g.connect(c.destination);o.start(t)}
+let AC,SFXG=null;
+function audio(){AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();return AC}
+function out(c){if(!SFXG||SFXG.context!==c){SFXG=c.createGain();SFXG.connect(c.destination)}SFXG.gain.value=S.sfxVol==null?1:S.sfxVol;return SFXG}
+function snd(f){if(S.mute)return;try{const c=audio();f(c,c.currentTime)}catch(e){}}
+function tone(c,t,f1,f2,d,type,v,dest){const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v||.15,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(dest||out(c));o.start(t);o.stop(t+d+.02)}
+function noise(c,t,d,f1,f2,v,dest){const n=c.sampleRate*d|0,b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;const o=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();o.buffer=b;fl.type="bandpass";fl.Q.value=1.2;fl.frequency.setValueAtTime(f1,t);fl.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v||.2,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(fl);fl.connect(g);g.connect(dest||out(c));o.start(t)}
 const SFX={
  cast:(c,t)=>{noise(c,t,.35,500,3000,.3);tone(c,t+.36,520,110,.18,"sine",.3);noise(c,t+.36,.25,1500,500,.12)},
  bite:(c,t)=>{noise(c,t,.18,1200,3500,.25);tone(c,t,880,880,.09,"square",.08);tone(c,t+.11,1320,1320,.14,"square",.08)},
@@ -504,6 +528,18 @@ const SFX={
  big:(c,t)=>{SFX.catch(c,t);[1047,1319,1568,2093].forEach((f,i)=>tone(c,t+.4+i*.08,f,f,.3,"triangle",.17))},
  gong:(c,t)=>{tone(c,t,140,70,1.4,"sine",.3);tone(c,t,280,140,1.1,"triangle",.12);noise(c,t,.4,300,900,.12)},
  golden:(c,t)=>{SFX.record(c,t);[1568,2093,2637,3136].forEach((f,i)=>tone(c,t+.9+i*.1,f,f,.5,"triangle",.14))},
+ plip:(c,t)=>{tone(c,t,900,420,.05,"sine",.08)},
+ plink:(c,t)=>{tone(c,t,1250,1600,.08,"sine",.08);tone(c,t+.06,1800,1800,.1,"sine",.04)},
+ nom:(c,t)=>{tone(c,t,320,170,.07,"square",.07);tone(c,t+.08,260,140,.06,"square",.05)},
+ boop:(c,t)=>{tone(c,t,380,760,.09,"sine",.12);tone(c,t+.1,520,1000,.07,"sine",.06)},
+ splash:(c,t)=>{noise(c,t,.28,2500,700,.18);tone(c,t+.04,500,200,.14,"sine",.08)},
+ knock:(c,t)=>{tone(c,t,190,110,.06,"square",.18);tone(c,t+.13,190,110,.06,"square",.16)},
+ creak:(c,t)=>{tone(c,t,170,95,.4,"sawtooth",.05);tone(c,t+.42,1320,1320,.5,"triangle",.07);tone(c,t+.55,1760,1760,.5,"triangle",.05)},
+ sponge:(c,t)=>{noise(c,t,.12,3000,1800,.07)},
+ pearl:(c,t)=>{tone(c,t,1320,1320,.12,"sine",.1);tone(c,t+.07,1760,1760,.16,"sine",.09)},
+ hurt:(c,t)=>{tone(c,t,200,60,.3,"sawtooth",.14);noise(c,t,.2,600,200,.1)},
+ air:(c,t)=>{tone(c,t,500,1200,.18,"sine",.1)},
+ crack:(c,t)=>{noise(c,t,.08,4000,1500,.18);tone(c,t+.1,700,1400,.15,"triangle",.1);tone(c,t+.25,1047,1047,.3,"triangle",.1)},
  stop:(c,t)=>{tone(c,t,220,110,.1,"square",.12)},
  tick:(c,t)=>{tone(c,t,1400,1000,.04,"square",.05)},
  record:(c,t)=>{[523,659,784,1047,1319,1568].forEach((f,i)=>{tone(c,t+i*.08,f,f,.3,"triangle",.2);tone(c,t+i*.08,f/2,f/2,.3,"square",.04)});[2093,2637,3136].forEach((f,i)=>tone(c,t+.55+i*.07,f,f,.35,"sine",.1));noise(c,t+.5,.5,2500,6000,.1)},
@@ -511,8 +547,64 @@ const SFX={
  coin:(c,t)=>{tone(c,t,988,988,.07,"square",.07);tone(c,t+.07,1319,1319,.18,"square",.07)}
 };
 const play=n=>snd((c,t)=>SFX[n](c,t));
-function muteLab(){$("#mute").textContent=S.mute?"Sound off":"Sound on"}
-$("#mute").onclick=()=>{S.mute=!S.mute;save();muteLab();if(!S.mute)play("coin")};
+function muteLab(){const sm=matchMedia("(max-width:480px)").matches;$("#mute").textContent=sm?(S.mute?"🔇":"🔊"):(S.mute?"Sound off":"Sound on");$("#mute").setAttribute("aria-label",S.mute?"Turn sound on":"Turn sound off")}
+$("#mute").onclick=()=>{S.mute=!S.mute;save();muteLab();if(!S.mute){ambStart();play("coin")}else ambApply()};
+
+/* ---------- ambience: every place has its own soundscape (made live, no sound files) ---------- */
+const AMB={c:null,m:null,L:{},tm:0,on:false};
+function ambBuild(c,dest){
+  const n=c.sampleRate*2|0,nb=c.createBuffer(1,n,c.sampleRate),a=nb.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;
+  const L={},src=()=>{const s=c.createBufferSource();s.buffer=nb;s.loop=true;s.start();return s};
+  const flt=(t,f,q)=>{const x=c.createBiquadFilter();x.type=t;x.frequency.value=f;x.Q.value=q||.7;return x};
+  const lay=(name,chain,hz,base,depth)=>{const g=c.createGain(),m=c.createGain();g.gain.value=0;m.gain.value=base==null?1:base;let nd=src();chain.forEach(f=>{nd.connect(f);nd=f});nd.connect(m);m.connect(g);g.connect(dest);
+    if(hz){const o=c.createOscillator(),d=c.createGain();o.frequency.value=hz;d.gain.value=depth;o.connect(d);d.connect(m.gain);o.start()}L[name]=g};
+  lay("wind",[flt("bandpass",420,.6)],.11,.6,.4);lay("water",[flt("lowpass",650,.3)],.23,.55,.45);lay("rain",[flt("highpass",2200),flt("lowpass",9000)]);
+  lay("bugs",[flt("bandpass",5200,9)],27,.5,.5);lay("under",[flt("lowpass",360,.4)],.14,.7,.3);
+  const g=c.createGain();g.gain.value=0;g.connect(dest);[52,53.4,104.5].forEach((f,i)=>{const o=c.createOscillator(),v=c.createGain();o.frequency.value=f;v.gain.value=i<2?.6:.2;o.connect(v);v.connect(g);o.start()});L.hum=g;
+  return L}
+// what to hear right now: layer volumes, which random sounds, and how often
+function ambProfile(o){o=o||{};
+  const mode=o.mode||(view==="aqua"?"tank":view==="dive"?"dive":"lake"),lake=o.L||L_().id,T=o.T||curTime(),W=o.W||wxNow().id;
+  const rain=(W==="rain"||W==="storm")&&lake!=="mystic",storm=W==="storm"&&lake!=="mystic",night=T==="night",quiet=mode==="lake"&&!o.full&&view!=="fish";
+  let t={wind:0,water:0,rain:0,bugs:0,hum:0,under:0},ev=[],gap=[2500,6500];
+  if(mode==="tank"){t.under=night?.05:.07;ev=[["blup",8]];if(o.bubbler)ev.push(["blup",8]);gap=[1100,3200]}
+  else if(mode==="dive"){t.under=.075;t.hum=.006;ev=[["blup",8]];gap=[800,2400]}
+  else if(lake==="pond"){t.wind=.02;t.water=.04;
+    if(T==="dawn"){ev=[["bird",10],["bird2",5]];gap=[1300,3800]}else if(T==="day"){ev=[["bird",6],["bird2",2],["gust",1]];gap=[2200,6000]}
+    else if(T==="sunset"){ev=[["bird",4],["cricket",4]];gap=[1800,5000]}else{t.wind=.014;t.water=.03;ev=[["cricket",9],["owl",2]];gap=[1500,4200]}}
+  else if(lake==="marsh"){t.water=.035;t.wind=.012;t.bugs=night?.005:.011;
+    if(night){ev=[["frog",9],["cricket",6]];gap=[1200,3600]}else if(T==="sunset"){ev=[["frog",7],["bird",2],["cricket",3]];gap=[1400,4200]}else{ev=[["frog",3],["bird",5],["bird2",2]];gap=[1800,5200]}}
+  else if(lake==="frost"){t.wind=.07;t.water=.008;ev=[["gust",6],["creak",3]];gap=[2800,7500]}
+  else{t.hum=.013;t.water=.014;ev=[["drip",9],["chime",2]];gap=[1000,3600]}
+  if(rain){t.rain=storm?.026:.018;if(storm){t.wind+=.015;ev=ev.concat([["thunder",3]])}else ev=ev.concat([["gust",1]])}
+  return{t,ev,gap,vol:(quiet?.35:1)}}
+const AEV={
+  bird:(c,t,d)=>{const b=2400+Math.random()*1400,n=2+(Math.random()*4|0);for(let i=0;i<n;i++)tone(c,t+i*.11,b,b*(1.15+Math.random()*.25),.07,"sine",.045,d)},
+  bird2:(c,t,d)=>{const b=1700+Math.random()*500;tone(c,t,b,b*1.5,.2,"sine",.05,d);tone(c,t+.24,b*1.5,b*1.1,.25,"sine",.045,d);tone(c,t+.55,b*1.2,b*1.7,.15,"sine",.04,d)},
+  frog:(c,t,d)=>{const f=95+Math.random()*30,n=1+(Math.random()*2|0);for(let i=0;i<n;i++){tone(c,t+i*.21,f,f*1.5,.09,"sawtooth",.034,d);tone(c,t+i*.21+.09,f*1.5,f*1.1,.1,"sawtooth",.03,d)}},
+  cricket:(c,t,d)=>{const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=4300+Math.random()*300;o.connect(g);g.connect(d);g.gain.setValueAtTime(0,t);for(let k=0;k<5;k++){g.gain.setValueAtTime(.02,t+k*.065);g.gain.setValueAtTime(0,t+k*.065+.035)}o.start(t);o.stop(t+.5)},
+  owl:(c,t,d)=>{tone(c,t,420,380,.35,"sine",.05,d);tone(c,t+.5,380,330,.6,"sine",.05,d)},
+  gust:(c,t,d)=>{noise(c,t,2.4,300,900,.05,d)},
+  creak:(c,t,d)=>{tone(c,t,300,80,.8,"sawtooth",.022,d);tone(c,t+.1,420,120,.6,"square",.01,d)},
+  drip:(c,t,d)=>{const f=1100+Math.random()*700;for(let i=0;i<3;i++)tone(c,t+i*.27,f*(1-i*.04),f*.55,.12,"sine",.05*Math.pow(.5,i),d)},
+  chime:(c,t,d)=>{const n=[880,1175,1319,1760,1568],f=n[Math.random()*n.length|0];for(let i=0;i<3;i++)tone(c,t+i*.33,f,f,.9,"triangle",.045*Math.pow(.55,i),d)},
+  thunder:(c,t,d)=>{noise(c,t,3,500,60,.08,d);noise(c,t+.2,1.6,300,50,.05,d)},
+  blup:(c,t,d)=>{const f=500+Math.random()*500;tone(c,t,f,f*2,.07,"sine",.05,d);if(Math.random()<.5)tone(c,t+.11,f*1.2,f*2.4,.06,"sine",.035,d)}};
+function ambMaster(){return(S.mute||(S.ambVol===0))?0:(S.ambVol==null?.7:S.ambVol)}
+function ambApply(){
+  if(!AMB.on||!AMB.c)return;const c=AMB.c,P=ambProfile({bubbler:view==="aqua"&&S.tanks[S.tk].decor.includes("bubbler")}),now=c.currentTime;
+  for(const k in AMB.L)AMB.L[k].gain.setTargetAtTime(P.t[k]||0,now,1.4);
+  if(ambMaster()===0){AMB.m.gain.cancelScheduledValues(now);AMB.m.gain.setValueAtTime(AMB.m.gain.value,now);AMB.m.gain.linearRampToValueAtTime(0,now+.4)}else AMB.m.gain.setTargetAtTime(ambMaster()*P.vol*5,now,.8)}
+function ambTick(){
+  clearTimeout(AMB.tm);if(!AMB.on||!AMB.c)return;
+  if(!document.hidden&&ambMaster()>0){const P=ambProfile({bubbler:view==="aqua"&&S.tanks[S.tk].decor.includes("bubbler")});
+    if(P.ev.length){let tot=P.ev.reduce((a,e)=>a+e[1],0),r=Math.random()*tot,e=P.ev[0];for(const x of P.ev){if((r-=x[1])<0){e=x;break}}AEV[e[0]](AMB.c,AMB.c.currentTime+.05,AMB.m)}
+    AMB.tm=setTimeout(ambTick,P.gap[0]+Math.random()*(P.gap[1]-P.gap[0]))}
+  else AMB.tm=setTimeout(ambTick,1500)}
+function ambStart(){
+  if(S.mute)return;try{const c=audio();if(!AMB.c){AMB.c=c;AMB.m=c.createGain();AMB.m.gain.value=0;AMB.m.connect(c.destination);AMB.L=ambBuild(c,AMB.m)}AMB.on=true;ambApply();ambTick()}catch(e){}}
+["pointerdown","keydown"].forEach(ev=>addEventListener(ev,function f(){removeEventListener(ev,f);ambStart()},{passive:true}));
+document.addEventListener("visibilitychange",()=>{if(!AMB.c)return;if(document.hidden){AMB.m.gain.setTargetAtTime(0,AMB.c.currentTime,.1);setTimeout(()=>{if(document.hidden&&AMB.c.state==="running")AMB.c.suspend()},400)}else{AMB.c.resume();ambApply()}});
 
 /* ---------- fishing ---------- */
 let st="idle",hold=false,tm,rf,cur,used;
@@ -547,10 +639,10 @@ function act(){
 }
 function castNow(b){
   if(st!=="idle")return;
-  S.baits[b.id]--;used=b;st="wait";play("cast");
+  const chx=fx();S.baits[b.id]--;used=Object.assign({},b,{hookT:chx.hook});st="wait";play("cast");if(S.charm){if(S.charm.luck>0)S.charm.luck--;if(S.charm.hook>0)S.charm.hook--}
   if(b.special){S.sacActive=true;S.sel="worm";$("#stage").classList.add("dev")}
   save();render();lab();img("idle");say(b.special?"The sacrifice sinks into the dark water…":"Line is out. Wait for a nibble…");
-  tm=setTimeout(bite,b.special?3500+R()*2500:(2500+R()*5500)*fx().wait);
+  tm=setTimeout(bite,b.special?3500+R()*2500:(2500+R()*5500)*chx.wait);
 }
 const rel=()=>hold=false;
 function bite(){
@@ -558,7 +650,7 @@ function bite(){
   if(dev){if(document.hidden){tm=setTimeout(bite,1000);return}if(view!=="fish")setView("fish")}
   cur=dev?{id:DEV,w:25,p:25000}:roll(used);st="bite";play(dev?"gong":"bite");lab();img("bite");
   say(dev?"A golden shape rises from the deep! Hook it NOW!":"Something bit! Hook it now!");
-  tm=setTimeout(()=>lose("Too slow. It spat out the bait."),dev?3000:fx().hook)}
+  tm=setTimeout(()=>lose("Too slow. It spat out the bait."),dev?3000:used.hookT)}
 function lose(m){
   if(S.sacActive&&cur&&cur.id===DEV)return devFail();
   play("lose");cancelAnimationFrame(rf);hold=false;st="idle";$("#mini").hidden=true;img("idle");say(m);render()}
@@ -644,7 +736,7 @@ $("#cB").onclick=e=>{e.stopPropagation();closeCard()};
 $("#card").onpointerdown=e=>e.stopPropagation();
 const A=$("#act");A.onpointerdown=e=>{e.preventDefault();act()};["pointerup","pointerleave","pointercancel"].forEach(ev=>A.addEventListener(ev,rel));
 const G=$("#stage");G.onpointerdown=()=>{if(st!=="done")act()};["pointerup","pointerleave","pointercancel"].forEach(ev=>G.addEventListener(ev,rel));
-addEventListener("blur",()=>rel());document.addEventListener("visibilitychange",()=>{if(document.hidden)rel()});
+addEventListener("resize",()=>muteLab());addEventListener("blur",()=>rel());document.addEventListener("visibilitychange",()=>{if(document.hidden)rel()});
 G.addEventListener("contextmenu",e=>e.preventDefault());A.addEventListener("contextmenu",e=>e.preventDefault());
 addEventListener("keydown",e=>{if(e.code==="Space"&&view==="fish"&&$("#modal").hidden&&!/INPUT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();if(!e.repeat)act()}});
 addEventListener("keyup",e=>{if(e.code==="Space"){e.preventDefault();rel()}});
@@ -748,32 +840,57 @@ function aquaSync(){
     const a={f,sp,L:sp.L,bt:BT[SP[q.s][0]]||0,x:AB.x0+30+R()*(AB.x1-AB.x0-60),y:AB.y0+20+R()*(AB.y1-AB.y0-40),vx:0,vy:0,sx:face,face,ph:R()*4,t:0,bob:R()*6,pause:R()*1.5,speed:Math.max(18,Math.min(52,60-sp.L*.9)),nb:4+R()*8,aura:q.a===8?48:q.a>=6?(q.a===7?300:190)+(q.v%10)*8:null};
     pickTarget(a);AQ.push(a)});
 }
-function bubble(x,y){BUB.push({x,y,v:9+R()*10,w:R()*6,r:R()<.3?2:1})}
+function bubble(x,y,z){BUB.push({x,y,v:9+R()*10,w:R()*6,r:R()<.3?2:1,z})}
+let aqAttr={x:0,y:0,t:0},aqPtr={x:0,y:0,px:0,py:0,t:0,down:false},aqTap={t:0,x:0,y:0},aqChase=15+R()*10,aqHop=20+R()*20,aqChest=false,cleaning=false;
+const RIP=[],lightsOn=()=>S.lights==null?!(new Date().getHours()>=22||new Date().getHours()<6):S.lights;
+const ripple=(x,y)=>RIP.push({x,y,r:1,l:1});
+const subPos=()=>{const t=performance.now()/1000;return{x:(t*9)%(AW+80)-40,y:72+Math.sin(t*.7)*6}};
+const DIRTB=Array.from({length:70},(_,i)=>{const r=rngSeed("algae"+i),e=r();return{x:e<.35?AB.x0-6+r()*26:e<.7?AB.x1-20+r()*26:AB.x0+r()*(AB.x1-AB.x0),y:e<.7?AB.y0+8+r()*(AB.y1-AB.y0):AB.y1-6+r()*8,s:2+(r()*4|0),k:i/70}});
 function aquaStep(dt){
+  const nowMs=performance.now(),dark=!lightsOn(),T0=S.tanks[S.tk];
   AQ.forEach(a=>{
     a.t+=dt;const hw=a.sp.W/2,hh=a.sp.Ht/2;
-    let pel=null;   // hungry fish swim to the nearest food pellet and eat it
-    if(PEL.length&&(a.f.full||0)<Date.now()){let bd=1e9;PEL.forEach(p=>{const dd=Math.hypot(p.x-a.x,p.y-a.y);if(dd<bd){bd=dd;pel=p}});
-      if(pel){a.tx=pel.x;a.tgy=pel.y;a.pause=0;if(bd<a.L*.45+3){PEL.splice(PEL.indexOf(pel),1);eatPellet(a);pel=null}}}
-    const dx=a.tx-a.x,dy=a.tgy-a.y,d=Math.hypot(dx,dy)||1;
-    if(a.pause>0){a.pause-=dt;const k=1-Math.min(1,dt*3);a.vx*=k;a.vy*=k}
-    else{if(d<5){a.pause=.3+R()*(R()<.35?3.5:1.2);pickTarget(a)}
-      const sp=a.speed*(pel?1.7:1)*(d>30?1:.45+d/55),k=Math.min(1,dt*2);a.vx+=(dx/d*sp-a.vx)*k;a.vy+=(dy/d*sp*.55-a.vy)*k}
+    if(a.spin>0)a.spin-=dt;if(a.scare>0)a.scare-=dt;if(a.boost>0)a.boost-=dt;
+    if(a.air){   // leaping out of the water
+      a.vy+=190*dt;a.x+=a.vx*dt*.5;a.y+=a.vy*dt;
+      if(a.y>=AB.y0+hh&&a.vy>0){a.air=false;a.y=AB.y0+hh;a.vy*=.2;ripple(a.x,AB.y0);play("splash");for(let i=0;i<4;i++)bubble(a.x+(R()-.5)*8,AB.y0+3)}
+      a.ph+=dt*8;a.sx+=(a.face-a.sx)*Math.min(1,dt*7);return}
+    let pel=null,mult=1;const goldy=PEL.some(p=>p.gold),hungry=(a.f.full||0)<Date.now();
+    if(PEL.length&&(hungry||goldy)){let bd=1e9;PEL.forEach(p=>{if(!hungry&&!p.gold)return;const dd=Math.hypot(p.x-a.x,p.y-a.y);if(dd<bd){bd=dd;pel=p}});
+      if(pel){a.tx=pel.x;a.tgy=pel.y;a.pause=0;if(bd<a.L*.45+3){PEL.splice(PEL.indexOf(pel),1);eatPellet(a,pel);pel=null}}}
+    if(!pel){   // playful moods: curiosity, tap-the-water, chasing games, hopping
+      if(aqAttr.t>nowMs&&Math.hypot(aqAttr.x-a.x,aqAttr.y-a.y)<140){a.tx=aqAttr.x+Math.cos(a.t*1.3+a.bob)*16;a.tgy=aqAttr.y+Math.sin(a.t*1.7+a.bob)*9;a.pause=0;mult=1.25}
+      else if(!cleaning&&aqPtr.t>nowMs-1200&&Math.hypot(aqPtr.x-a.x,aqPtr.y-a.y)<85){a.tx=aqPtr.x-a.face*10;a.tgy=aqPtr.y;a.pause=0;mult=.9}
+      else if(a.chase&&a.boost>0&&AQ.includes(a.chase)){a.tx=a.chase.x-a.chase.face*8;a.tgy=a.chase.y;a.pause=0;mult=1.5}
+      else if(a.hop){a.tx=a.x;a.tgy=AB.y0+hh;a.pause=0;mult=1.7;
+        if(a.y<AB.y0+hh+4){a.hop=0;a.air=true;a.vy=-60;a.vx=a.face*10;play("splash");ripple(a.x,AB.y0);for(let i=0;i<5;i++)bubble(a.x+(R()-.5)*8,AB.y0+4);return}}
+      if(a.scare>0)mult=1.8;
+      a.tx=Math.max(AB.x0+hw,Math.min(AB.x1-hw,a.tx));a.tgy=Math.max(AB.y0+hh,Math.min(AB.y1-hh,a.tgy))}
+    if(dark&&!pel)mult*=.5;
+    const busy=pel||mult!==1||a.boost>0,dx=a.tx-a.x,dy=a.tgy-a.y,d=Math.hypot(dx,dy)||1;
+    if(a.pause>0&&!busy){a.pause-=dt;const k=1-Math.min(1,dt*3);a.vx*=k;a.vy*=k}
+    else{if(d<5&&!busy){a.pause=.3+R()*(R()<.35?3.5:1.2);pickTarget(a)}
+      const sp=a.speed*(pel?1.7:mult)*(d>30?1:.45+d/55),k=Math.min(1,dt*2);a.vx+=(dx/d*sp-a.vx)*k;a.vy+=(dy/d*sp*.55-a.vy)*k}
     AQ.forEach(b=>{if(b===a)return;const ox=a.x-b.x,oy=a.y-b.y,od=Math.hypot(ox,oy)||1;if(od<(a.L+b.L)*.4){a.vx+=ox/od*dt*45;a.vy+=oy/od*dt*45}});
     a.x+=a.vx*dt;a.y+=a.vy*dt;
     if(a.x<AB.x0+hw){a.x=AB.x0+hw;pickTarget(a)}if(a.x>AB.x1-hw){a.x=AB.x1-hw;pickTarget(a)}
     if(a.y<AB.y0+hh)a.y=AB.y0+hh;if(a.y>AB.y1-hh)a.y=AB.y1-hh;
     if(Math.abs(a.vx)>3)a.face=a.vx>0?1:-1;
-    a.sx+=(a.face-a.sx)*Math.min(1,dt*7);            // smooth turn-around
-    a.ph+=dt*(3+Math.hypot(a.vx,a.vy)*.28);          // tail beats faster when swimming faster
-    a.nb-=dt;if(a.nb<=0){a.nb=6+R()*9;bubble(a.x+a.face*a.sp.W*.35,a.y-2)}
+    a.sx+=(a.face-a.sx)*Math.min(1,dt*7);
+    a.ph+=dt*(3+Math.hypot(a.vx,a.vy)*.28);
+    a.nb-=dt;if(a.nb<=0){a.nb=dark?3+R()*4:6+R()*9;bubble(a.x+a.face*a.sp.W*.35,a.y-2,dark)}
     if(a.aura!==null&&R()<dt*3)SPK.push({x:a.x+(R()-.5)*a.sp.W,y:a.y+(R()-.5)*a.sp.Ht,l:.7,h:a.aura})
   });
+  aqChase-=dt;if(aqChase<=0){aqChase=24+R()*16;if(AQ.length>1&&!PEL.length&&!dark){const l=AQ[R()*AQ.length|0],f=AQ[R()*AQ.length|0];if(f!==l&&!f.air&&!l.air){f.chase=l;f.boost=l.boost=6;l.pause=0;pickTarget(l)}}}
+  aqHop-=dt;if(aqHop<=0){aqHop=28+R()*22;const c=AQ.filter(a=>a.bt!==3&&a.L<34&&!a.air);if(c.length&&!dark)c[R()*c.length|0].hop=1}
   if(R()<dt*1.1)bubble(AB.x0+R()*(AB.x1-AB.x0),AB.y1-2);
-  S.tanks[S.tk].decor.forEach(id=>{const dx=DECOR[id].x;if(id==="bubbler"&&R()<dt*3.5)bubble(dx+(R()-.5)*5,AB.y1-6);if(id==="chest"&&chestOpen()&&R()<dt*9)bubble(dx+(R()-.5)*8,AB.y1-10)});
+  T0.decor.forEach(id=>{const dx=DECOR[id].x;if(id==="bubbler"&&R()<dt*3.5)bubble(dx+(R()-.5)*5,AB.y1-6);if(id==="chest"&&chestOpen()&&R()<dt*9)bubble(dx+(R()-.5)*8,AB.y1-10);
+    if(id==="diverfig"&&R()<dt*1.4)bubble(dx+3,AB.y1-16);if(id==="sub"&&R()<dt*4){const p=subPos();bubble(p.x-14,p.y)}});
+  const co=chestOpen()&&T0.decor.includes("chest");if(co&&!aqChest&&view==="aqua")play("creak");aqChest=co;
   for(let i=PEL.length-1;i>=0;i--){const p=PEL[i];p.y=Math.min(AB.y1-1,p.y+p.vy*dt);p.x+=Math.sin(p.y*.3)*.1;p.life-=dt;if(p.life<=0)PEL.splice(i,1)}
   for(let i=BUB.length-1;i>=0;i--){const b=BUB[i];b.y-=b.v*dt;b.x+=Math.sin(b.y*.25+b.w)*.15;if(b.y<AB.y0-2)BUB.splice(i,1)}
   for(let i=SPK.length-1;i>=0;i--){SPK[i].l-=dt;if(SPK[i].l<=0)SPK.splice(i,1)}
+  for(let i=RIP.length-1;i>=0;i--){RIP[i].r+=dt*22;RIP[i].l-=dt*1.1;if(RIP[i].l<=0)RIP.splice(i,1)}
   PLK.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.x<AB.x0)p.x=AB.x1;if(p.x>AB.x1)p.x=AB.x0;if(p.y<AB.y0)p.y=AB.y1;if(p.y>AB.y1)p.y=AB.y0});
   if(aqSel){aqSelT-=dt;if(aqSelT<=0){aqSel=null}tagPos()}
 }
@@ -783,53 +900,103 @@ function aquaDraw(){
   drawScenery(x);
   [...AQ].sort((a,b)=>a.y-b.y).forEach(a=>{
     if(a.aura!==null){x.globalCompositeOperation="lighter";const g=x.createRadialGradient(a.x,a.y,2,a.x,a.y,a.L*1.1);g.addColorStop(0,`hsla(${a.aura},90%,60%,.35)`);g.addColorStop(1,`hsla(${a.aura},90%,60%,0)`);x.fillStyle=g;x.fillRect(a.x-a.L*1.2,a.y-a.L*1.2,a.L*2.4,a.L*2.4);x.globalCompositeOperation="source-over"}
-    x.save();x.translate(Math.round(a.x),Math.round(a.y+Math.sin(a.t*1.6+a.bob)*.8));x.scale(a.sx,1);
+    x.save();x.translate(Math.round(a.x),Math.round(a.y+(a.air?0:Math.sin(a.t*1.6+a.bob)*.8)));x.scale(a.spin>0?Math.cos((.6-a.spin)/.6*Math.PI*6):a.sx,1);
     x.drawImage(a.sp.frames[Math.floor(a.ph)%4],-Math.round(a.sp.W/2),-Math.round(a.sp.Ht/2));x.restore();
     if(aqSel===a){x.strokeStyle="rgba(255,255,255,.55)";x.strokeRect(Math.round(a.x-a.sp.W/2-2)+.5,Math.round(a.y-a.sp.Ht/2-2)+.5,a.sp.W+3,a.sp.Ht+3)}
   });
-  PEL.forEach(p=>{x.fillStyle="#d9a85c";x.fillRect(p.x|0,p.y|0,2,2);x.fillStyle="#f3d79a";x.fillRect(p.x|0,p.y|0,1,1)});
-  BUB.forEach(b=>{x.fillStyle="rgba(215,245,255,.75)";x.fillRect(b.x|0,b.y|0,b.r,b.r);x.fillStyle="rgba(255,255,255,.9)";x.fillRect(b.x|0,b.y|0,1,1)});
+  PEL.forEach(p=>{x.fillStyle=p.gold?"#ffd25a":"#d9a85c";x.fillRect(p.x|0,p.y|0,2,2);x.fillStyle=p.gold?"#fff3b0":"#f3d79a";x.fillRect(p.x|0,p.y|0,1,1)});
+  BUB.forEach(b=>{if(b.z){x.fillStyle="rgba(230,240,255,.85)";x.font="6px monospace";x.fillText("z",b.x|0,b.y|0);return}x.fillStyle="rgba(215,245,255,.75)";x.fillRect(b.x|0,b.y|0,b.r,b.r);x.fillStyle="rgba(255,255,255,.9)";x.fillRect(b.x|0,b.y|0,1,1)});
   SPK.forEach(p=>{x.fillStyle=`hsla(${p.h},100%,85%,${Math.min(1,p.l*1.6)})`;x.fillRect(p.x|0,(p.y|0)-1,1,3);x.fillRect((p.x|0)-1,p.y|0,3,1)});
+  RIP.forEach(r=>{x.strokeStyle=`rgba(220,245,255,${r.l*.7})`;x.beginPath();x.ellipse(r.x,r.y,r.r,r.r*.32,0,0,Math.PI*2);x.stroke()});
+  const dn=dirtNow(tk());   // moss on the glass
+  if(dn>1){x.fillStyle=`rgba(70,120,50,${.0018*dn})`;x.fillRect(0,0,AW,AH);DIRTB.forEach(b=>{if(dn>b.k*100){x.fillStyle="rgba(75,140,55,.3)";x.fillRect(b.x|0,b.y|0,b.s,b.s);x.fillStyle="rgba(40,100,40,.35)";x.fillRect((b.x|0)+1,(b.y|0)+1,Math.max(1,b.s-2),Math.max(1,b.s-2))}})}
+  if(cleaning&&aqPtr.t>performance.now()-3000){x.fillStyle="#f2d54a";x.fillRect(aqPtr.x-5,aqPtr.y-4,10,7);x.fillStyle="#d6b52c";x.fillRect(aqPtr.x-5,aqPtr.y+1,10,2);x.fillStyle="#fff";x.fillRect(aqPtr.x-3,aqPtr.y-6,2,2);x.fillRect(aqPtr.x+2,aqPtr.y-7,2,2)}
 }
 function tagContent(){const t=$("#petTag");if(!aqSel){t.hidden=true;return}t.hidden=false;t.innerHTML="<b></b><small></small>";t.firstChild.textContent=nameOf(aqSel.f);t.lastChild.textContent=aqSel.f.w+" kg";tagPos()}
 function tagPos(){const t=$("#petTag");if(!aqSel){t.hidden=true;return}t.style.left=Math.max(12,Math.min(88,aqSel.x/AW*100))+"%";t.style.top=Math.max(14,(aqSel.y-aqSel.sp.Ht/2-3)/AH*100)+"%"}
 function aquaLoop(n){if(view!=="aqua"){aqRun=false;return}if(n-(aquaLoop.u||0)>1000){aquaLoop.u=n;tipsUpdate()}const dt=Math.min(.05,(n-aqLast)/1000);aqLast=n;aquaStep(dt);aquaDraw();requestAnimationFrame(aquaLoop)}
 function aquaStart(){aquaSync();if(aqRun)return;aqRun=true;aqLast=performance.now();requestAnimationFrame(aquaLoop)}
+const cpos=e=>{const r=$("#tankc").getBoundingClientRect();return[(e.clientX-r.left)/r.width*AW,(e.clientY-r.top)/r.height*AH]};
+function wipe(x,y){const t=tk(),d=Math.hypot(x-aqPtr.px,y-aqPtr.py),was=dirtNow(t);if(!d||was<=0)return;setDirt(t,was-d*.16);
+  if(performance.now()-(wipe.s||0)>140){wipe.s=performance.now();play("sponge");bubble(x,y)}
+  if(dirtNow(t)<=0){toast("Sparkling clean! Visitors will love it.");play("pearl");for(let i=0;i<8;i++)SPK.push({x:x+(R()-.5)*30,y:y+(R()-.5)*20,l:.9,h:190})}}
+$("#tankc").addEventListener("pointermove",e=>{const[x,y]=cpos(e);aqPtr.px=aqPtr.x;aqPtr.py=aqPtr.y;aqPtr.x=x;aqPtr.y=y;aqPtr.t=performance.now();if(cleaning&&aqPtr.down)wipe(x,y)});
+["pointerup","pointerleave","pointercancel"].forEach(ev=>$("#tankc").addEventListener(ev,()=>{if(aqPtr.down&&cleaning){save();tipsUpdate()}aqPtr.down=false}));
 $("#tankc").addEventListener("pointerdown",e=>{
-  const r=e.currentTarget.getBoundingClientRect(),mx=(e.clientX-r.left)/r.width*AW,my=(e.clientY-r.top)/r.height*AH;let best=null,bd=1e9;
+  const[mx,my]=cpos(e);aqPtr.down=true;aqPtr.px=aqPtr.x=mx;aqPtr.py=aqPtr.y=my;aqPtr.t=performance.now();
+  if(cleaning)return;
+  let best=null,bd=1e9;
   AQ.forEach(a=>{const dx=Math.abs(mx-a.x),dy=Math.abs(my-a.y);if(dx<=a.sp.W/2+4&&dy<=a.sp.Ht/2+4){const d=dx*dx+dy*dy;if(d<bd){bd=d;best=a}}});
-  aqSel=best;if(best){best.pause=3.5;aqSelT=4;bubble(best.x,best.y-3);play("tick")}tagContent();
+  aqSel=best;
+  if(best){best.pause=3.5;aqSelT=4;best.spin=.6;bubble(best.x,best.y-3);play("boop");for(let i=0;i<3;i++)SPK.push({x:best.x+(R()-.5)*best.sp.W,y:best.y-best.sp.Ht/2-R()*5,l:.9,h:340})}
+  else{const t=performance.now();
+    if(t-aqTap.t<380&&Math.hypot(mx-aqTap.x,my-aqTap.y)<30){   // double tap = knock on the glass: everyone darts away
+      play("knock");ripple(mx,my);AQ.forEach(a=>{const ox=a.x-mx,oy=a.y-my,od=Math.hypot(ox,oy)||1;a.vx=ox/od*70;a.vy=oy/od*45;a.scare=.9;a.pause=0})}
+    else{ripple(mx,my);play("plink");aqAttr={x:mx,y:my,t:t+4000}}
+    aqTap={t,x:mx,y:my}}
+  tagContent();
 });
 /* ---------- tanks, decorations, feeding, tips, breeding ---------- */
-const TANKS=[{theme:"classic",n:"Classic tank",cost:0,filter:"none"},{theme:"marsh",n:"Bayou tank",cost:8000,filter:"sepia(.55) hue-rotate(-18deg) saturate(1.5)"},{theme:"frost",n:"Frost tank",cost:25000,filter:"hue-rotate(18deg) saturate(.55) brightness(1.18)"},{theme:"cavern",n:"Cavern tank",cost:70000,filter:"hue-rotate(205deg) saturate(1.4) brightness(.8)"}];
-const DECOR={coral:{n:"Coral cluster",cost:300,pts:3,x:52,e:"🌿"},anchor:{n:"Old anchor",cost:600,pts:4,x:96,e:"⚓"},bubbler:{n:"Bubble stone",cost:900,pts:5,x:140,e:"💧"},chest:{n:"Treasure chest",cost:1500,pts:6,x:184,e:"🧰"},lamp:{n:"Glow lamp",cost:3000,pts:8,x:228,e:"💡"},castle:{n:"Sunken castle",cost:6000,pts:10,x:266,e:"🏰"}};
+const TANKS=[
+ {theme:"classic",n:"Classic tank",cost:0,strain:4,filter:"none"},
+ {theme:"marsh",n:"Bayou tank",cost:8000,strain:5,filter:"sepia(.55) hue-rotate(-18deg) saturate(1.5)"},
+ {theme:"frost",n:"Frost tank",cost:25000,strain:6,filter:"hue-rotate(18deg) saturate(.55) brightness(1.18)"},
+ {theme:"cavern",n:"Cavern tank",cost:70000,strain:7,filter:"hue-rotate(205deg) saturate(1.4) brightness(.8)"},
+ {theme:"dawn",n:"Dawn tank",cost:120000,strain:0,filter:"sepia(.45) hue-rotate(-35deg) saturate(1.35) brightness(1.1)"},
+ {theme:"reef",n:"Reef tank",cost:180000,strain:1,filter:"hue-rotate(-28deg) saturate(1.5) brightness(1.08)"},
+ {theme:"sunset",n:"Sunset tank",cost:260000,strain:2,filter:"sepia(.75) saturate(1.9) hue-rotate(-42deg)"},
+ {theme:"deep",n:"Deep sea tank",cost:350000,strain:3,filter:"hue-rotate(12deg) saturate(1.25) brightness(.62)"}];
+const homeOf=t=>(TANKS.find(x=>x.theme===t.theme)||TANKS[0]).strain;
+const DECOR={
+ kelp:{n:"Swaying kelp",cost:350,pts:3,x:24,e:"🌿"},coral:{n:"Coral cluster",cost:300,pts:3,x:46,e:"🪸"},starfish:{n:"Starfish",cost:500,pts:3,x:70,e:"⭐"},
+ anchor:{n:"Old anchor",cost:600,pts:4,x:92,e:"⚓"},statue:{n:"Stone fish statue",cost:4500,pts:9,x:114,e:"🗿"},bubbler:{n:"Bubble stone",cost:900,pts:5,x:136,e:"🫧"},
+ wreck:{n:"Shipwreck",cost:9000,pts:14,x:164,e:"🚢"},chest:{n:"Treasure chest",cost:1500,pts:6,x:198,e:"🧰"},lamp:{n:"Glow lamp",cost:3000,pts:8,x:220,e:"💡"},
+ diverfig:{n:"Tiny diver",cost:2500,pts:6,x:240,e:"🤿"},castle:{n:"Sunken castle",cost:6000,pts:10,x:268,e:"🏰"},sub:{n:"Toy submarine",cost:7000,pts:12,x:0,e:"🚤"},
+ jelly:{n:"Moon jellies",pearls:70,pts:12,x:0,e:"🪼"},goldshell:{n:"Golden pearl shell",pearls:120,pts:16,x:290,e:"🐚"}};
 const FPT=[1,1,2,2,4,7,12,20,100],HRS=3600000;
 let par=[];
 const tk=()=>S.tanks[S.tk];
 const hyTag=f=>f&&f.hy?' <span class="tag hy">Hybrid</span>':'';
 const hm=ms=>{const h=Math.floor(ms/HRS),m=Math.max(1,Math.ceil(ms%HRS/60000));return h?h+"h "+m+"m":m+"m"};
 function appeal(t){const sp=new Set(),st=new Set();let a=0;
-  t.fish.forEach(f=>{const q=fi(f.id);a+=FPT[q.a]+(f.hy?2:0)+(f.pet?1:0)+(f.w0?Math.floor((f.w/f.w0-1)*10):0);sp.add(q.s);st.add(q.m)});
+  t.fish.forEach(f=>{const q=fi(f.id);a+=FPT[q.a]+(q.m===homeOf(t)?2:0)+(f.hy?2:0)+(f.pet?1:0)+(f.w0?Math.floor((f.w/f.w0-1)*10):0);sp.add(q.s);st.add(q.m)});
   return a+sp.size+st.size+t.decor.reduce((x,id)=>x+DECOR[id].pts,0)}
-const tipRate=t=>appeal(t)*10;   // shunk per hour
+const dirtNow=t=>Math.min(100,(t.dirt||0)+(Date.now()-(t.dt||Date.now()))/(36*HRS)*100);
+function setDirt(t,v){t.dirt=Math.max(0,Math.min(100,v));t.dt=Date.now()}
+const tipRate=t=>Math.round(appeal(t)*10*(1.1-dirtNow(t)/200));   // a clean glass earns more, a mossy one less
 const tipsPending=t=>Math.floor(Math.min(8*HRS,Date.now()-t.t)/HRS*tipRate(t));
-function tipsUpdate(){const t=tk();if(!t)return;$("#tankStats").innerHTML=`<b>Appeal ${appeal(t)}</b> · visitors tip about <b>${tipRate(t).toLocaleString()} shunk an hour</b>. Waiting now: <b>${tipsPending(t).toLocaleString()} shunk</b> <span class="muted">(fills for up to 8 hours)</span>`;$("#collect").disabled=tipsPending(t)<1}
-function growFish(f){if(!f.w0){f.w0=f.w;f.p0=f.p}f.w=+Math.min(f.w0*1.6,f.w+f.w0*.025).toFixed(2);f.p=Math.max(1,Math.round(f.p0*f.w/f.w0));f.ate=(f.ate||0)+1;if(f.ate>=3){f.ate=0;f.full=Date.now()+20*60000}}
-function eatPellet(a){growFish(a.f);a.sp=spriteFor(a.f);a.L=a.sp.L;play("tick");for(let i=0;i<3;i++)SPK.push({x:a.x+(R()-.5)*a.sp.W,y:a.y-a.sp.Ht/2-R()*4,l:.8,h:340});save()}
+function tipsUpdate(){const t=tk();if(!t)return;const dn=Math.round(dirtNow(t)),eg=t.eggs[0];
+  $("#tankStats").innerHTML=`<b>Appeal ${appeal(t)}</b> · visitors tip about <b>${tipRate(t).toLocaleString()} shunk an hour</b>. Waiting now: <b>${tipsPending(t).toLocaleString()} shunk</b> <span class="muted">(fills for up to 8 hours)</span><br><span class="muted">Home strain: ${MARKS[homeOf(t)]} (+2 appeal each). Glass: ${dn<10?"sparkling":dn<40?"a little dusty":dn<70?"mossy":"very mossy"}${dn>=40?", tips are lower":""}.</span>`;
+  $("#collect").disabled=tipsPending(t)<1;if(eg&&Date.now()>=eg.ready&&!eg.n){eg.n=1;toast("An egg is ready to hatch!");play("pearl");save()}}
+function growFish(f,m){m=m||1;if(!f.w0){f.w0=f.w;f.p0=f.p}f.w=+Math.min(f.w0*1.6,f.w+f.w0*.025*m).toFixed(2);f.p=Math.max(1,Math.round(f.p0*f.w/f.w0));if(m===1){f.ate=(f.ate||0)+1;if(f.ate>=3){f.ate=0;f.full=Date.now()+20*60000}}}
+function eatPellet(a,p){growFish(a.f,p&&p.gold?3:1);a.sp=spriteFor(a.f);a.L=a.sp.L;a.spin=.6;play("nom");for(let i=0;i<3;i++)SPK.push({x:a.x+(R()-.5)*a.sp.W,y:a.y-a.sp.Ht/2-R()*4,l:.8,h:340});save()}
 function chestOpen(){return(performance.now()/1000)%7<1.6}
 function drawScenery(x){
-  const B=AB.y1+4,t=performance.now()/1000,T=tk();
+  const B=AB.y1+4,t=performance.now()/1000,T=tk(),dark=!lightsOn();
   T.decor.forEach(id=>{const cx=DECOR[id].x;
+    if(id==="kelp"){["#4f9a3a","#3f8a30","#62ad45"].forEach((c,k)=>{x.fillStyle=c;for(let y=0;y<30;y+=3){const o=Math.sin(t*1.4+y*.18+k)*(1+y*.05);x.fillRect(Math.round(cx-3+k*3+o),B-y-3,2,3)}})}
     if(id==="coral"){["#e86f8f","#f2a35b","#e0527a","#f7b0c0"].forEach((c,i)=>{const dx=[-6,-2,3,7][i],h=[10,16,12,8][i];x.fillStyle=c;x.fillRect(cx+dx,B-h,3,h);x.fillRect(cx+dx-2,B-h-2+i%2,2,2);x.fillRect(cx+dx+3,B-h+1,2,2)})}
+    if(id==="starfish"){x.fillStyle="#f08a3a";x.fillRect(cx-1,B-4,3,3);x.fillRect(cx-4,B-3,3,1);x.fillRect(cx+2,B-3,3,1);x.fillRect(cx,B-7,1,3);x.fillRect(cx-3,B-1,2,2);x.fillRect(cx+2,B-1,2,2);x.fillStyle="#ffd0a0";x.fillRect(cx,B-3,1,1)}
     if(id==="anchor"){x.fillStyle="#7d8b94";x.fillRect(cx-1,B-20,3,19);x.fillRect(cx-6,B-17,13,2);x.fillStyle="#5d6b74";x.fillRect(cx-8,B-5,3,4);x.fillRect(cx+6,B-5,3,4);x.fillRect(cx-6,B-2,13,2);x.fillStyle="#6f9a55";x.fillRect(cx-1,B-8,3,2)}
+    if(id==="statue"){x.fillStyle="#8c959c";x.fillRect(cx-7,B-4,15,4);x.fillRect(cx-3,B-14,7,10);x.fillStyle="#a6afb6";x.fillRect(cx-5,B-20,11,6);x.fillRect(cx+5,B-18,3,2);x.fillStyle="#6c757c";x.fillRect(cx+2,B-19,1,1);x.fillRect(cx-7,B-19,2,4)}
     if(id==="bubbler"){x.fillStyle="#6c7780";x.fillRect(cx-7,B-6,15,6);x.fillStyle="#8a95a0";x.fillRect(cx-5,B-8,10,3);x.fillStyle="#4d5860";x.fillRect(cx-1,B-9,3,2)}
+    if(id==="wreck"){x.fillStyle="#5a3a22";x.fillRect(cx-20,B-8,40,8);x.fillRect(cx-16,B-12,32,4);x.fillStyle="#4a2e1a";x.fillRect(cx-22,B-6,4,6);x.fillRect(cx+18,B-14,5,14);x.fillStyle="#3a2412";x.fillRect(cx-3,B-26,3,18);x.fillStyle="#c9c0a0";x.fillRect(cx-1,B-22,8,7);x.fillStyle="#2a1c10";[-12,-4,4,12].forEach(d=>x.fillRect(cx+d,B-7,3,3))}
     if(id==="chest"){const o=chestOpen();x.fillStyle="#8a5a2c";x.fillRect(cx-9,B-9,18,9);x.fillStyle="#e0b030";x.fillRect(cx-9,B-5,18,2);x.fillRect(cx-1,B-7,3,4);
       if(o){x.fillStyle="#6b4420";x.fillRect(cx-9,B-18,18,4);x.fillStyle="#ffd25a";x.fillRect(cx-7,B-11,14,2);if(Math.sin(t*14)>0){x.fillStyle="#fff7c8";x.fillRect(cx-5,B-13,1,1);x.fillRect(cx+3,B-14,1,1)}}else{x.fillStyle="#6b4420";x.fillRect(cx-9,B-13,18,4)}}
-    if(id==="lamp"){x.fillStyle="#4a3a2a";x.fillRect(cx-1,B-26,3,25);x.fillStyle="#ffd25a";x.fillRect(cx-3,B-31,7,7);x.fillStyle="#fff3b0";x.fillRect(cx-1,B-29,3,3);
-      x.globalCompositeOperation="lighter";const g=x.createRadialGradient(cx,B-28,2,cx,B-28,30);const a=.34+.08*Math.sin(t*2);g.addColorStop(0,`rgba(255,210,100,${a})`);g.addColorStop(1,"rgba(255,210,100,0)");x.fillStyle=g;x.fillRect(cx-32,B-60,64,64);x.globalCompositeOperation="source-over"}
+    if(id==="lamp"){x.fillStyle="#4a3a2a";x.fillRect(cx-1,B-26,3,25);x.fillStyle="#ffd25a";x.fillRect(cx-3,B-31,7,7);x.fillStyle="#fff3b0";x.fillRect(cx-1,B-29,3,3)}
+    if(id==="diverfig"){x.fillStyle="#e8742a";x.fillRect(cx-3,B-12,7,9);x.fillRect(cx-5,B-8,3,6);x.fillRect(cx+4,B-9,3,6);x.fillStyle="#9ad7ff";x.fillRect(cx-2,B-17,6,5);x.fillStyle="#cfeaff";x.fillRect(cx-1,B-16,2,2);x.fillStyle="#6a7a86";x.fillRect(cx-6,B-12,3,7);x.fillStyle="#222";x.fillRect(cx-4,B-3,4,3);x.fillRect(cx+1,B-3,4,3)}
     if(id==="castle"){x.fillStyle="#c9b27a";x.fillRect(cx-16,B-14,32,14);x.fillRect(cx-18,B-26,9,26);x.fillRect(cx+9,B-30,9,30);x.fillStyle="#b39b64";for(let k=0;k<3;k++){x.fillRect(cx-18+k*4,B-29,3,3);x.fillRect(cx+9+k*4,B-33,3,3)}
       x.fillStyle="#3a2e1c";x.fillRect(cx-14,B-22,3,5);x.fillRect(cx+12,B-24,3,5);x.fillRect(cx-3,B-9,7,9);x.fillStyle="#d0392e";x.fillRect(cx+13,B-38,1,5);x.fillRect(cx+14,B-38,5,3)}
+    if(id==="goldshell"){x.fillStyle="#d9a830";x.fillRect(cx-8,B-9,17,9);x.fillStyle="#f2c94c";for(let k=-3;k<=3;k++)x.fillRect(cx+k*2,B-13+Math.abs(k),2,12-Math.abs(k));x.fillStyle="#a8791c";x.fillRect(cx-9,B-2,19,2)}
   });
+  if(T.decor.includes("sub")){const p=subPos();x.fillStyle="#f2c230";x.fillRect(p.x-12,p.y-4,24,8);x.fillRect(p.x-8,p.y-7,10,4);x.fillStyle="#9ad7ff";x.fillRect(p.x-3,p.y-3,3,3);x.fillRect(p.x+3,p.y-3,3,3);x.fillStyle="#c9402e";x.fillRect(p.x-14,p.y-2,2,4);x.fillStyle="#6a7a86";x.fillRect(p.x-1,p.y-9,1,3)}
+  if(dark){x.fillStyle="rgba(4,8,30,.3)";x.fillRect(0,0,AW,AH)}
+  x.globalCompositeOperation="lighter";   // lights and glowing things shine on top of the dark
+  if(T.decor.includes("lamp")){const cx=DECOR.lamp.x,g=x.createRadialGradient(cx,B-28,2,cx,B-28,dark?44:30),a=(dark?.7:.34)+.08*Math.sin(t*2);g.addColorStop(0,`rgba(255,210,100,${a})`);g.addColorStop(1,"rgba(255,210,100,0)");x.fillStyle=g;x.fillRect(cx-46,B-76,92,92)}
+  if(T.decor.includes("jelly")){for(let k=0;k<2;k++){const jx=60+Math.sin(t*.25+k*2)*80+k*110,jy=72+Math.sin(t*.6+k)*18,g=x.createRadialGradient(jx,jy,1,jx,jy,16);g.addColorStop(0,"rgba(190,170,255,.45)");g.addColorStop(1,"rgba(190,170,255,0)");x.fillStyle=g;x.fillRect(jx-16,jy-16,32,32);
+    x.fillStyle="rgba(215,200,255,.8)";x.fillRect(jx-5,jy-4,10,4);x.fillRect(jx-4,jy-6,8,2);x.fillStyle="rgba(235,225,255,.6)";for(let i=0;i<4;i++)x.fillRect(jx-4+i*3,jy,1,6+Math.sin(t*3+i+k)*2)}}
+  if(T.decor.includes("goldshell")){const cx=DECOR.goldshell.x,a=.5+.3*Math.sin(t*3),g=x.createRadialGradient(cx,B-6,1,cx,B-6,10);g.addColorStop(0,`rgba(255,250,220,${a})`);g.addColorStop(1,"rgba(255,250,220,0)");x.fillStyle=g;x.fillRect(cx-10,B-16,20,20)}
+  x.globalCompositeOperation="source-over";
   if(T.eggs.length){const e=T.eggs[0],ready=Date.now()>=e.ready,px=160,py=B-4;x.fillStyle=ready?"#fff1b0":"#d9d2b0";x.fillRect(px-3,py-6,7,8);x.fillRect(px-2,py-8,5,2);x.fillStyle="#a89a70";x.fillRect(px-1,py-3,1,1);x.fillRect(px+2,py-5,1,1);
     if(ready&&Math.sin(t*6)>0){x.fillStyle="#fff";x.fillRect(px-5,py-9,1,1);x.fillRect(px+5,py-4,1,1)}}
 }
@@ -845,17 +1012,20 @@ function startBreed(){
   t.eggs.push({ready:Date.now()+4*HRS,id:(v*NSP+s)*NM+m,w,mut});a.rest=b.rest=Date.now()+12*HRS;par=[];play("coin");save();render();toast("An egg is incubating. It hatches in 4 hours.")}
 function hatchEgg(){
   const t=tk(),e=t.eggs[0];if(!e||Date.now()<e.ready)return;t.eggs.shift();
-  const q=fi(e.id),f={id:e.id,w:e.w,p:Math.max(1,Math.round(e.w*SP[q.s][3]*ADJ[q.a][2]*PM*1.25)),hy:1};S.bag.push(f);S.hybrids=(S.hybrids||0)+1;play("golden");save();render();
+  const q=fi(e.id),f={id:e.id,w:e.w,p:Math.max(1,Math.round(e.w*SP[q.s][3]*ADJ[q.a][2]*PM*1.25)),hy:1};S.bag.push(f);S.hybrids=(S.hybrids||0)+1;play("crack");setTimeout(()=>play("golden"),350);save();render();
   const fr=spriteFor(f).frames[1],c=document.createElement("canvas");c.width=fr.width;c.height=fr.height;c.getContext("2d").drawImage(fr,0,0);c.style.cssText="height:64px;image-rendering:pixelated";
   modal("A hybrid hatched!","<div id='hatchSpr' style='text-align:center;margin-bottom:6px'></div><p><b>"+esc(fname(f.id))+"</b> <span class='tag' style='background:"+RC[q.a]+"'>"+RAR[q.a]+"</span> <span class='tag hy'>Hybrid</span></p><p>"+f.w+" kg, worth "+f.p.toLocaleString()+" shunk."+(e.mut?" <b>A mutation! It hatched a rarity higher.</b>":"")+"</p><p class='muted'>It is in your bag. Put it in a tank or sell it.</p>",[["Wonderful",null,1]],e.mut?"gold":"");
   $("#hatchSpr").appendChild(c)}
 $("#collect").onclick=()=>{const t=tk(),n=tipsPending(t);if(n<1)return;S.shunk+=n;t.t=Date.now();play("coin");save();render();toast("Visitors left "+n.toLocaleString()+" shunk in the tip jar.")};
-$("#feed").onclick=()=>{
-  if(!S.aq.length)return toast("Put a fish in the tank first.");if(!(S.items.food>0))return toast("No fish food. Buy some in the Shop, or earn it from orders.");
-  if(S.aq.every(f=>(f.full||0)>Date.now()))return toast("Everyone is full. Try again later.");
-  S.items.food--;for(let i=0;i<8;i++)PEL.push({x:AB.x0+20+R()*(AB.x1-AB.x0-40),y:AB.y0+2-R()*10,vy:12+R()*8,life:9});play("tick");save();render()};
+function feedNow(gold){const key=gold?"sfood":"food";
+  if(!S.aq.length)return toast("Put a fish in the tank first.");if(!(S.items[key]>0))return toast("No "+(gold?"super":"fish")+" food. Buy some in the Shop"+(gold?" or with pearls.":", or earn it from orders."));
+  if(!gold&&S.aq.every(f=>(f.full||0)>Date.now()))return toast("Everyone is full. Try again later, or use super food.");
+  S.items[key]--;for(let i=0;i<8;i++){PEL.push({x:AB.x0+20+R()*(AB.x1-AB.x0-40),y:AB.y0+2-R()*10,vy:12+R()*8,life:9,gold});setTimeout(()=>play("plip"),i*90)}save();render()}
+$("#feed").onclick=()=>feedNow(false);$("#feed2").onclick=()=>feedNow(true);
+$("#lights").onclick=()=>{S.lights=S.lights==null?true:S.lights===true?false:null;play("tick");save();render()};
+$("#clean").onclick=()=>{cleaning=!cleaning;$("#tankc").classList.toggle("clean",cleaning);aqSel=null;tagContent();play("tick");if(cleaning)toast("Swipe across the glass to wipe away the moss.");render()};
 function aquaRender(){
-  const t=tk(),T=TANKS.find(x=>x.theme===t.theme)||TANKS[0];$("#tank img").style.filter=T.filter;
+  const t=tk(),T=TANKS.find(x=>x.theme===t.theme)||TANKS[0];$("#tank img").style.filter=((T.filter==="none"?"":T.filter)+(lightsOn()?"":" brightness(.55)")).trim()||"none";$("#lights").textContent="Lights: "+(S.lights==null?"auto ("+(lightsOn()?"on":"off")+")":S.lights?"on":"off");$("#clean").textContent=cleaning?"Done cleaning":"Clean glass";$("#feed2").hidden=!(S.items.sfood>0);$("#feed2").textContent="Super food ("+(S.items.sfood||0)+")";
   $("#tankTabs").innerHTML=S.tanks.map((x,i)=>`<button class="chip ${i===S.tk?"on":""}" data-tk="${i}">${(TANKS.find(y=>y.theme===x.theme)||TANKS[0]).n}</button>`).join("")+(S.tanks.length<TANKS.length?`<button class="chip" data-buytank="1">+ ${TANKS[S.tanks.length].n} (${TANKS[S.tanks.length].cost.toLocaleString()})</button>`:"");
   $("#aqN").textContent="("+S.aq.length+" / 5)";par=par.filter(i=>S.aq[i]);
   const foc=document.activeElement;
@@ -867,7 +1037,7 @@ function aquaRender(){
     <p style="margin:0 0 8px">${a&&b?`<b>${esc(nameOf(a))}</b> + <b>${esc(nameOf(b))}</b><br><span class="muted">Costs ${(150+100*(fi(a.id).a+fi(b.id).a)).toLocaleString()} shunk. Hatches in 4 hours. Parents rest for 12 hours.</span>`:'<span class="muted">No parents chosen yet.</span>'}</p>
     <button data-breed="1" ${a&&b&&!eg?"":"disabled"}>Start breeding</button>
     ${eg?`<p style="margin:10px 0 6px"><b>🥚 An egg is incubating.</b> ${Date.now()>=eg.ready?"It is ready!":"Ready in "+hm(eg.ready-Date.now())+"."}</p><button data-hatch="1" ${Date.now()>=eg.ready?"":"disabled"}>Hatch the egg</button>`:""}`;
-  $("#decorList").innerHTML=Object.keys(DECOR).map(id=>{const D=DECOR[id],own=t.decor.includes(id);return `<div class="row"><span style="font-size:24px">${D.e}</span><span class="n"><b>${D.n}</b><br><span class="muted">+${D.pts} appeal</span></span>${own?'<span class="tag" style="background:#3f9a2c">In tank</span>':`<button data-deco="${id}" ${S.shunk<D.cost?"disabled":""}>Buy · ${D.cost.toLocaleString()}</button>`}</div>`}).join("");
+  $("#decorList").innerHTML=Object.keys(DECOR).map(id=>{const D=DECOR[id],own=t.decor.includes(id),can=D.pearls?(S.pearls||0)>=D.pearls:S.shunk>=D.cost;return `<div class="row"><span style="font-size:24px">${D.e}</span><span class="n"><b>${D.n}</b><br><span class="muted">+${D.pts} appeal${D.pearls?", pearls only":""}</span></span>${own?'<span class="tag" style="background:#3f9a2c">In tank</span>':`<button data-deco="${id}" ${can?"":"disabled"}>${D.pearls?"🦪 "+D.pearls:"Buy · "+D.cost.toLocaleString()}</button>`}</div>`}).join("");
   $("#aqBag").innerHTML=S.bag.length?S.bag.map((f,i)=>`<div class="row"><span style="font-size:24px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))}${hyTag(f)}<br><span class="muted">${f.w} kg</span></span><button data-aqadd="${i}" ${S.aq.length>=5?"disabled":""}>Put in tank</button></div>`).join(""):'<p class="muted">Your bag is empty.</p>';
   $("#feed").textContent="Feed fish ("+(S.items.food||0)+")";tipsUpdate();aquaSync();
 }
@@ -915,6 +1085,112 @@ function spin(){
 }
 $("#spin").onclick=spin;$("#lever").onclick=spin;$("#lever").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();spin()}});
 
+/* ---------- pearl dive ---------- */
+const ZONES=[
+ {id:"shallow",n:"Sunlit Shallows",lake:"pond",mult:1,spd:1,col:["#55c8f2","#1f8ccc","#0e4f8a"],haz:[["jelly",5],["urchin",4]]},
+ {id:"kelp",n:"Kelp Forest",lake:"marsh",mult:1.4,spd:1.1,col:["#7fb45c","#3f7a40","#1e3f2c"],haz:[["jelly",4],["urchin",4],["eel",3]]},
+ {id:"ice",n:"Ice Caves",lake:"frost",mult:1.8,spd:1.2,col:["#b9ecf8","#52a8d0","#1f5080"],haz:[["jelly",3],["urchin",3],["eel",4]]},
+ {id:"crystal",n:"Crystal Depths",lake:"mystic",mult:2.4,spd:1.3,col:["#3a3a8a","#1f1f58","#0b0b2a"],haz:[["jelly",4],["urchin",3],["eel",5]]}];
+const DGEAR={o2:{n:"Air tank",e:"🫁",d:"More air in every dive",cost:[15,40,90,180],fx:l=>"+"+l*8+" seconds of air"},fin:{n:"Flippers",e:"🦶",d:"Swim faster",cost:[15,40,90,180],fx:l=>"+"+l*12+"% speed"},mag:{n:"Pearl magnet",e:"🧲",d:"Pulls pearls in from farther away",cost:[20,50,100,200],fx:l=>"reach +"+l*5}};
+const PSHOP=[
+ {id:"luck",n:"Lucky charm",e:"🍀",cost:20,d:"Your next 15 casts have much better luck.",give:()=>{S.charm.luck+=15}},
+ {id:"hook",n:"Quick-hook charm",e:"⏱️",cost:15,d:"Your next 15 casts bite faster, with extra time to hook.",give:()=>{S.charm.hook+=15}},
+ {id:"sfood",n:"Super food x3",e:"✨",cost:10,d:"Golden pellets make tank fish grow three times as much, even when they are full.",give:()=>{S.items.sfood=(S.items.sfood||0)+3}},
+ {id:"glow",n:"Glow lure x5",e:"💡",cost:25,d:"Five Glow lures for your bait box.",give:()=>{addBait("glow",5)}},
+ {id:"fly",n:"Golden fly x5",e:"🪰",cost:40,d:"Five Golden flies for your bait box.",give:()=>{addBait("fly",5)}}];
+const DW=360,DH=200,DSURF=16,DFLOOR=184,clampN=(v,a,b)=>Math.max(a,Math.min(b,v));
+let D={run:false},zoneSel="shallow",dvPtr={x:180,y:100,on:false},dvKeys={},dvLast=0,dvLoop=false,dvT=0;
+const DBUB=[];
+function diveRender(){
+  $("#pearlN").textContent="🦪 "+(S.pearls||0).toLocaleString();
+  $("#zoneChips").innerHTML=ZONES.map(z=>`<button class="chip ${zoneSel===z.id?"on":""}" data-zone="${z.id}" ${D.run?"disabled":""}>${S.lakes[z.lake]?"":"🔒 "}${z.n} x${z.mult}</button>`).join("");
+  $("#pearlShop").innerHTML=PSHOP.map(i=>`<div class="item"><div class="e">${i.e}</div><b>${i.n}</b><p class="muted">${i.d}</p><button data-ps="${i.id}" ${S.pearls<i.cost?"disabled":""}>🦪 ${i.cost}</button></div>`).join("");
+  $("#diveGear").innerHTML=Object.keys(DGEAR).map(k=>{const g=DGEAR[k],l=S.dg[k]||0,max=g.cost.length;return `<div class="item"><div class="e">${g.e}</div><b>${g.n}</b> <span class="muted">${"●".repeat(l)}${"○".repeat(max-l)}</span><p class="muted" style="margin:4px 0">${g.d}.<br>Now: ${l?g.fx(l):"no bonus"}${l<max?"<br>Next: "+g.fx(l+1):""}</p>${l<max?`<button data-dg="${k}" ${S.pearls<g.cost[l]?"disabled":""}>🦪 ${g.cost[l]}</button>`:'<span class="tag" style="background:#3f9a2c">Maxed</span>'}</div>`}).join("");
+  $("#diveGo").disabled=!!D.run;$("#diveEnd").hidden=!D.run;
+  $("#diveStats").textContent=`Dives: ${S.dive.count}. Best here: ${S.dive.best[zoneSel]||0} pearls.${S.diveDay!==new Date().toDateString()?" First dive today pays 50% extra!":""}`}
+function startDive(){
+  const z=ZONES.find(x=>x.id===zoneSel);if(!S.lakes[z.lake])return toast("Unlock "+LAKES.find(l=>l.id===z.lake).n+" first.");
+  const o2=45+8*S.dg.o2;D={run:true,z,t:0,o2,max:o2,x:60,y:100,vx:0,vy:0,inv:0,got:0,chests:0,hits:0,O:[],sp:.4,airT:5,world:0,shake:0,msg:""};
+  dvPtr.on=false;play("air");render();diveStart()}
+function takeItem(o){
+  if(o.k==="pearl"){D.got+=.35;play("pearl")}else if(o.k==="black"){D.got+=1;play("pearl")}
+  else if(o.k==="air"){D.o2=Math.min(D.max,D.o2+6);play("air")}else if(o.k==="chest"){D.got+=3;D.chests++;play("creak")}
+  for(let i=0;i<4;i++)DBUB.push({x:o.x,y:o.y,vx:(Math.random()-.5)*30,vy:-20-Math.random()*20,l:.6})}
+function spawnDive(){
+  const z=D.z,r=Math.random();
+  if(r<.34){const n=2+(Math.random()*3|0),y0=30+Math.random()*120,amp=10+Math.random()*20;for(let i=0;i<n;i++)D.O.push({k:"pearl",x:DW+10+i*16,y:clampN(y0+Math.sin(i*.9)*amp,24,170)})}
+  else if(r<.40)D.O.push({k:"black",x:DW+10,y:30+Math.random()*130});
+  else if(r<.43)D.O.push({k:"chest",x:DW+10,y:DFLOOR-6});
+  else if(r<.80){const tot=z.haz.reduce((a,h)=>a+h[1],0);let q=Math.random()*tot,k=z.haz[0][0];for(const h of z.haz){if((q-=h[1])<0){k=h[0];break}}
+    if(k==="urchin")D.O.push({k,x:DW+10,y:DFLOOR-6});else if(k==="jelly")D.O.push({k,x:DW+10,y0:40+Math.random()*100,y:70,ph:Math.random()*6});else D.O.push({k:"eel",x:DW+12,y0:35+Math.random()*115,y:70,ph:Math.random()*6})}}
+function diveStep(dt){
+  dvT+=dt;
+  for(let i=DBUB.length-1;i>=0;i--){const b=DBUB[i];b.x+=b.vx*dt;b.y+=b.vy*dt;b.l-=dt;if(b.l<=0)DBUB.splice(i,1)}
+  if(!D.run)return;
+  const z=D.z;D.t+=dt;D.o2-=dt*(1+Math.max(0,(D.t-60)/60));D.inv=Math.max(0,D.inv-dt);D.shake=Math.max(0,D.shake-dt);
+  const sp=(38+Math.min(34,D.t*.35))*z.spd,fin=1+.12*S.dg.fin,mag=10+5*S.dg.mag;D.world+=sp*dt;
+  if(dvKeys.l||dvKeys.r||dvKeys.u||dvKeys.d){D.vx=((dvKeys.r?1:0)-(dvKeys.l?1:0))*100*fin;D.vy=((dvKeys.d?1:0)-(dvKeys.u?1:0))*100*fin}
+  else if(dvPtr.on){const dx=dvPtr.x-D.x,dy=dvPtr.y-D.y,d=Math.hypot(dx,dy);if(d>3){const v=Math.min(110*fin,d*6);D.vx=dx/d*v;D.vy=dy/d*v}else D.vx=D.vy=0}
+  else{D.vx*=.9;D.vy*=.9}
+  D.x=clampN(D.x+D.vx*dt,14,DW-14);D.y=clampN(D.y+D.vy*dt,DSURF+6,DFLOOR-8);
+  D.sp-=dt;if(D.sp<=0){D.sp=Math.max(.6,1.25-D.t*.004)*(.8+Math.random()*.5);spawnDive()}
+  D.airT-=dt;if(D.airT<=0){D.airT=8+Math.random()*3;D.O.push({k:"air",x:DW+10,y:40+Math.random()*110})}
+  for(let i=D.O.length-1;i>=0;i--){const o=D.O[i];o.t=(o.t||0)+dt;
+    o.x+=(o.k==="eel"?-(sp+55*z.spd):-sp)*dt;
+    if(o.k==="jelly")o.y=o.y0+Math.sin(o.t*1.6+o.ph)*22;if(o.k==="eel")o.y=o.y0+Math.sin(o.t*3+o.ph)*10;
+    if(o.x<-30){D.O.splice(i,1);continue}
+    const dx=o.x-D.x,dy=o.y-D.y,dist=Math.hypot(dx,dy)||1;
+    if(o.k==="pearl"||o.k==="black"){if(S.dg.mag>0&&dist<mag+6){o.x-=dx/dist*90*dt;o.y-=dy/dist*90*dt}if(dist<9){takeItem(o);D.O.splice(i,1)}}
+    else if(o.k==="air"){if(dist<10){takeItem(o);D.O.splice(i,1)}}
+    else if(o.k==="chest"){if(dist<13){takeItem(o);D.O.splice(i,1)}}
+    else if(D.inv<=0&&dist<(o.k==="eel"?11:9)){D.o2-=6;D.hits++;D.inv=1.4;D.shake=.3;D.x=Math.max(14,D.x-14);play("hurt")}
+  }
+  if(Math.random()<dt*3)DBUB.push({x:D.x-6,y:D.y-4,vx:-8,vy:-14-Math.random()*8,l:.9});
+  if(D.o2<=0)endDive()}
+function endDive(){
+  if(!D.run)return;D.run=false;const z=D.z,today=new Date().toDateString(),bonus=S.diveDay!==today?1.5:1,total=Math.floor(D.got*z.mult*bonus);
+  S.pearls+=total;S.dive.count++;S.dive.best[z.id]=Math.max(S.dive.best[z.id]||0,total);S.diveDay=today;if(D.chests)S.items.food=(S.items.food||0)+D.chests;
+  play(total>=25?"golden":total>0?"pearl":"lose");save();render();
+  modal("Dive finished","<p><b>"+total+" pearls</b>"+(z.mult>1?" (zone bonus x"+z.mult+")":"")+(bonus>1?", +50% for your first dive of the day":"")+".</p><p class='muted'>"+D.hits+" hit"+(D.hits===1?"":"s")+(D.chests?", "+D.chests+" chest"+(D.chests>1?"s":"")+" ("+D.chests+" fish food)":"")+". Total pearls: "+S.pearls+".</p>",[["Dive again",()=>{startDive()}],["Done",null,1]])}
+function diveDraw(){
+  const c=$("#divec"),x=c.getContext("2d");x.imageSmoothingEnabled=false;
+  const z=D.z||ZONES.find(q=>q.id===zoneSel),sh=D.shake>0?(Math.random()-.5)*4:0;
+  x.save();x.translate(sh,0);
+  const g=x.createLinearGradient(0,0,0,DH);g.addColorStop(0,z.col[0]);g.addColorStop(.55,z.col[1]);g.addColorStop(1,z.col[2]);x.fillStyle=g;x.fillRect(-4,0,DW+8,DH);
+  x.fillStyle="rgba(255,255,255,.07)";for(let i=0;i<5;i++){const rx=((i*80-(dvT*8)%80)%400);x.beginPath();x.moveTo(rx,0);x.lineTo(rx+30,0);x.lineTo(rx-30,DFLOOR);x.lineTo(rx-60,DFLOOR);x.fill()}
+  const w=D.world||dvT*30;
+  x.fillStyle="rgba(0,0,0,.16)";for(let i=0;i<9;i++){const bx=((i*52-w*.35)%520+520)%520-40,h=28+(i*37%30);x.fillRect(bx,DFLOOR-h,8,h);x.fillRect(bx-4,DFLOOR-h*.6,5,h*.6)}   // far kelp
+  x.fillStyle=z.id==="ice"?"#e8f6fc":z.id==="crystal"?"#2d2a5e":"#d8c488";x.fillRect(0,DFLOOR,DW,DH-DFLOOR);x.fillStyle="rgba(0,0,0,.18)";x.fillRect(0,DFLOOR,DW,2);
+  for(let i=0;i<14;i++){const sx=((i*31-w)%434+434)%434-30;x.fillStyle=z.id==="crystal"?"#5a4fb0":z.id==="ice"?"#bfe3f2":"#b5a26a";x.fillRect(sx,DFLOOR+4+(i*7%9),6,2)}
+  x.fillStyle="rgba(255,255,255,.25)";x.fillRect(0,DSURF,DW,1);
+  // things in the water
+  (D.O||[]).forEach(o=>{const t=dvT;
+    if(o.k==="pearl"||o.k==="black"){x.fillStyle=o.k==="pearl"?"#fff":"#3a2a55";x.beginPath();x.arc(o.x,o.y,o.k==="pearl"?4:5,0,7);x.fill();x.fillStyle=o.k==="pearl"?"#c9d8ee":"#7a5ab0";x.fillRect(o.x-1,o.y-2,2,2);x.fillStyle="#fff";x.fillRect(o.x-2,o.y-3,1,1)}
+    if(o.k==="air"){x.strokeStyle="rgba(230,250,255,.9)";x.fillStyle="rgba(180,230,255,.35)";x.beginPath();x.arc(o.x,o.y+Math.sin(t*4+o.x)*1.5,6,0,7);x.fill();x.stroke();x.fillStyle="#fff";x.fillRect(o.x-3,o.y-3,2,2)}
+    if(o.k==="chest"){x.fillStyle="#8a5a2c";x.fillRect(o.x-8,o.y-5,16,10);x.fillStyle="#e0b030";x.fillRect(o.x-8,o.y-1,16,2);x.fillRect(o.x-1,o.y-3,3,5);x.fillStyle="#6b4420";x.fillRect(o.x-8,o.y-8,16,4);if(Math.sin(t*8)>0){x.fillStyle="#fff7c8";x.fillRect(o.x+5,o.y-10,2,2)}}
+    if(o.k==="jelly"){x.fillStyle="rgba(255,150,200,.85)";x.fillRect(o.x-7,o.y-5,14,5);x.fillRect(o.x-5,o.y-8,10,3);x.fillStyle="rgba(255,190,225,.8)";for(let i=0;i<4;i++)x.fillRect(o.x-5+i*3,o.y,1,7+Math.sin(t*5+i)*3)}
+    if(o.k==="urchin"){x.fillStyle="#3a2050";x.beginPath();x.arc(o.x,o.y,5,0,7);x.fill();x.fillStyle="#7a4aa8";for(let a=0;a<8;a++){const an=a*Math.PI/4;x.fillRect(o.x+Math.cos(an)*7-1,o.y+Math.sin(an)*7-1,2,2)}}
+    if(o.k==="eel"){for(let i=0;i<7;i++){x.fillStyle=i%2?"#3f9a4a":"#2f7a3a";x.fillRect(o.x+i*3,o.y+Math.sin(t*9+i*.9)*2-2,4,4)}x.fillStyle="#ffd25a";x.fillRect(o.x-1,o.y-2,2,2);x.fillStyle="#111";x.fillRect(o.x-1,o.y-1,1,1)}});
+  DBUB.forEach(b=>{x.fillStyle=`rgba(230,250,255,${Math.min(1,b.l*1.5)})`;x.fillRect(b.x|0,b.y|0,2,2)});
+  // the diver
+  const px=D.x||60,py=D.y||100;if(!D.inv||Math.floor(dvT*14)%2===0){const f=Math.sin(dvT*10)*1.5;
+    x.fillStyle="#e8742a";x.fillRect(px-6,py-3,12,6);x.fillStyle="#c95a18";x.fillRect(px-8,py-2+f,3,4);x.fillStyle="#2a2a2a";x.fillRect(px-12,py-1+f*1.5,5,2);x.fillRect(px-12,py+2-f*1.5,5,2);
+    x.fillStyle="#9ad7ff";x.fillRect(px+3,py-5,6,6);x.fillStyle="#e8f6ff";x.fillRect(px+4,py-4,2,2);x.fillStyle="#6a7a86";x.fillRect(px-6,py-6,5,3)}
+  x.restore();
+  // HUD
+  x.fillStyle="rgba(0,0,0,.45)";x.fillRect(0,0,DW,13);x.fillStyle="#fff";x.font="9px monospace";
+  if(D.run){x.fillText("PEARLS "+Math.floor(D.got*D.z.mult),5,10);const pct=Math.max(0,D.o2/D.max);x.fillStyle="#222";x.fillRect(DW-124,3,118,7);x.fillStyle=pct>.35?"#5ad0ff":"#ff6a5a";x.fillRect(DW-123,4,116*pct,5);x.fillStyle="#fff";x.fillText("AIR",DW-148,10)}
+  else{x.fillText(z.n.toUpperCase(),5,10);x.fillStyle="rgba(0,0,0,.35)";x.fillRect(60,80,240,40);x.fillStyle="#fff";x.font="11px monospace";x.fillText("Press Start dive",120,104)}}
+function diveLoopFn(n){if(view!=="dive"){dvLoop=false;return}const dt=Math.min(.05,(n-dvLast)/1000);dvLast=n;diveStep(dt);diveDraw();requestAnimationFrame(diveLoopFn)}
+function diveStart(){if(dvLoop)return;dvLoop=true;dvLast=performance.now();requestAnimationFrame(diveLoopFn)}
+(()=>{const c=$("#divec"),pos=e=>{const r=c.getBoundingClientRect();dvPtr.x=(e.clientX-r.left)/r.width*DW;dvPtr.y=(e.clientY-r.top)/r.height*DH};
+  c.addEventListener("pointerdown",e=>{pos(e);dvPtr.on=true;c.setPointerCapture&&c.setPointerCapture(e.pointerId)});
+  c.addEventListener("pointermove",e=>{if(e.pointerType==="mouse"||dvPtr.on)pos(e);if(e.pointerType==="mouse")dvPtr.on=true});
+  ["pointerup","pointercancel"].forEach(ev=>c.addEventListener(ev,e=>{if(e.pointerType!=="mouse")dvPtr.on=false}));c.addEventListener("pointerleave",()=>{dvPtr.on=false});
+  const key=(e,v)=>{if(view!=="dive")return;const m={ArrowLeft:"l",KeyA:"l",ArrowRight:"r",KeyD:"r",ArrowUp:"u",KeyW:"u",ArrowDown:"d",KeyS:"d"}[e.code];if(m){dvKeys[m]=v;e.preventDefault()}};
+  addEventListener("keydown",e=>{if(!/INPUT|TEXTAREA/.test(e.target.tagName))key(e,true)});addEventListener("keyup",e=>key(e,false))})();
+$("#diveGo").onclick=startDive;$("#diveEnd").onclick=()=>{if(D.run)endDive()};
+
 /* ---------- harbor orders ---------- */
 function rngSeed(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return((h^=h>>>16)>>>0)/4294967296}}
 function genOrder(day,idx,rr){
@@ -954,6 +1230,11 @@ function ordersRender(){
   $("#ordInfo").textContent="New orders in "+h+"h "+m+"m. Done today: "+L.filter(o=>o.done).length+" of "+L.length+". Finish all four for a chest. Streak: "+(S.ordLast===d||S.ordLast===new Date(Date.now()-864e5).toDateString()?(S.ordStreak||0):0)+" day"+((S.ordStreak||0)===1?"":"s")+".";
   $("#ordList").innerHTML=L.map((o,i)=>{const n=S.bag.filter(f=>okf(o,f)).length;return `<div class="item ord ${o.done?"done":""}"><span class="tag" style="background:${["","#3f9a2c","#2f78c8","#d0392e"][o.diff]}">${["","Easy","Medium","Hard"][o.diff]}</span><p style="margin:6px 0">${esc(orderText(o))}</p><p class="muted" style="margin:0 0 8px">Reward: <b>${o.sh} shunk</b>${esc(itemText(o))}</p>${o.done?'<b style="color:#2f7a22">Delivered</b>':`<button data-od="${i}" ${n?"":"disabled"}>${n?"Deliver ("+n+" match"+(n>1?"es":"")+")":"No match in bag"}</button> <button data-rr="${i}" ${S.shunk<50*(o.rr+1)?"disabled":""}>New order · ${50*(o.rr+1)}</button>`}</div>`}).join("");
 }
+
+/* ---------- volume sliders ---------- */
+$("#sfxVol").value=Math.round((S.sfxVol==null?1:S.sfxVol)*100);$("#ambVol").value=Math.round((S.ambVol==null?.7:S.ambVol)*100);
+$("#sfxVol").oninput=e=>{S.sfxVol=e.target.value/100;save()};$("#sfxVol").onchange=()=>play("coin");
+$("#ambVol").oninput=e=>{S.ambVol=e.target.value/100;save();ambApply()};
 
 /* ---------- save code / reset ---------- */
 function showCode(code){modal("Your save code",'<p class="muted">Copy all of this text and keep it somewhere safe.</p><textarea readonly id="codeBox"></textarea>',[["Close",null,1]]);$("#codeBox").value=code;$("#codeBox").select()}
