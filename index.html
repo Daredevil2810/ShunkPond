@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Shunk Pond – Fishing Game</title>
-<meta name="description" content="Shunk Pond: a cozy pixel-art fishing game. Catch over 67,000 fish, fill your aquarium, and gamble your catch.">
+<meta name="description" content="Shunk Pond: a cozy pixel-art fishing game. Catch over 120,000 different fish, fill your aquarium with toys and friends, and dive for pearls.">
 <meta name="theme-color" content="#7a4b24">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='13' font-size='13'%3E%F0%9F%8E%A3%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -294,7 +294,7 @@ input.pet{font:inherit;width:100%;max-width:230px;margin-top:4px;padding:4px 8px
       <div class="panel"><h2>Breeding den</h2><div id="breedBox"></div></div>
     </div>
     <div>
-      <div class="panel"><h2>Decorations</h2><p class="muted" style="margin:0 0 6px">Decorations add appeal, which earns more tips from visitors.</p><div id="decorList"></div></div>
+      <div class="panel"><h2>Decorations</h2><p class="muted" style="margin:0 0 6px">Decorations add appeal, which earns more tips from visitors. Toys (duck, ball, crab, hoop, music box, orb) are alive: tap them, drag them, flick them. Your fish play with them too.</p><div id="decorList"></div></div>
       <div class="panel"><h2>Your bag</h2><p class="muted" style="margin:0 0 6px">Put up to 5 fish in each tank. You can take them back out any time.</p><div id="aqBag"></div></div>
     </div>
   </div>
@@ -327,12 +327,12 @@ const ADJ=[["Pond",30,1],["River",24,1.3],["Silver",17,1.7],["Spotted",12,2.2],[
 const RAR=["Common","Common","Uncommon","Uncommon","Rare","Epic","Legendary","Mythic","Platinum"];
 const RC=["#7d8b7d","#7d8b7d","#3f9a2c","#3f9a2c","#2f78c8","#8a4fd0","#d98a1f","#d0392e","#6f8499"];
 // species: name, emoji, avg kg, shunk per kg
-const SP=[["Minnow","🐟",0.1,40],["Perch","🐠",0.6,25],["Carp","🐟",3,12],["Trout","🐟",1.5,22],["Catfish","🐡",5,10],["Bass","🐟",2,20],["Pike","🦈",4,8],["Eel","🐍",1.2,30],["Salmon","🐟",4.5,12],["Sturgeon","🐟",18,6],["Koi","🐠",2.5,25],["Tuna","🐟",25,5],["Swordfish","🦈",40,4],["Anglerfish","🐡",8,12],["Guppy","🐠",0.044,346.52],["Molly","🐠",0.136,170.52],["Tetra","🐠",0.124,130.33],["Betta","🐠",0.12,141.22],["Goby","🐠",0.03,223.36],["Blenny","🐠",0.128,110.75],["Killifish","🐠",0.112,83.23],["Stickleback","🐠",0.072,351.41],["Gudgeon","🐟",0.127,199.39],["Bleak","🐠",0.117,58.84],["Dace","🐠",0.065,121.81],["Smelt","🐠",0.033,589.88],["Anchovy","🐠",0.085,81.21],["Sardine","🐠",0.134,102.14],["Damselfish","🐠",0.078,201.24],["Clownfish","🐠",0.098,254.76],["Pipefish","🐟",0.099,207.91],["Roach","🐡",1.17,33.34],["Rudd","🐠",0.39,110.67],["Chub","🐟",0.43,126.03],["Loach","🐠",0.86,42.04],["Bluegill","🐡",0.94,61.03],["Sunfish","🐠",0.53,63.9],["Pumpkinseed","🐡",0.79,55.97],["Crappie","🐠",0.73,74.28],["Herring","🐟",0.48,108.3],["Shad","🐡",0.33,134.98],["Mullet","🐠",1.16,43.81],["Wrasse","🐡",0.62,40.86],["Tang","🐠",0.74,52.0],["Angelfish","🐠",1.03,39.25],["Discus","🐠",1.05,28.79],["Oscar","🐡",0.69,68.29],["Archerfish","🐟",0.53,105.26],["Mudskipper","🐠",1.17,44.82],["Sculpin","🐠",1.15,38.49],["Whitefish","🐠",0.63,39.84],["Cisco","🐟",0.43,129.24],["Grayling","🐟",0.3,137.93],["Pompano","🐟",0.85,29.71],["Tilapia","🐠",0.86,56.56],["Boxfish","🐡",0.9,48.54],["Piranha","🐟",0.3,149.75],["Bream","🐠",4.96,18.06],["Tench","🐡",4.6,19.33],["Barbel","🐡",2.5,26.67],["Walleye","🐟",5.44,11.31],["Zander","🐟",3.38,11.73],["Burbot","🐠",5.03,17.39],["Mackerel","🐟",3.78,14.35],["Bonito","🐟",3.84,10.97],["Snapper","🐟",5.81,9.37],["Cod","🐠",1.73,29.8],["Haddock","🐟",5.71,15.62],["Pollock","🐠",3.8,13.25],["Flounder","🐠",3.53,24.73],["Sole","🐟",5.77,11.4],["Plaice","🐠",2.19,28.53],["Turbot","🐟",4.31,13.59],["Parrotfish","🐠",4.55,7.43],["Pufferfish","🐡",1.65,42.71],["Lionfish","🐠",1.7,37.65],["Stonefish","🐡",3.53,21.86],["Scorpionfish","🐟",3.68,19.67],["Trevally","🐡",2.08,30.3],["Sweetlips","🐡",5.53,6.92],["Hake","🐠",5.3,10.21],["Ling","🐠",3.9,21.69],["Lamprey","🐍",2.87,17.9],["Bowfin","🐠",3.59,25.83],["Dorado","🐡",2.79,14.6],["Pacu","🐡",3.67,10.13],["Muskie","🐟",33.49,3.88],["Gar","🦈",15.4,9.12],["Grouper","🐟",28.66,3.46],["Halibut","🐟",38.76,2.45],["Skate","🦈",19.25,6.25],["Ray","🦈",11.51,10.55],["Barramundi","🐟",26.23,4.22],["Barracuda","🦈",11.25,7.77],["Amberjack","🦈",13.48,8.86],["Wahoo","🐟",31.12,2.62],["Sailfish","🐟",24.21,3.63],["Arapaima","🦈",17.31,5.32],["Opah","🦈",16.2,4.22],["Coelacanth","🐟",21.26,3.21],["Paddlefish","🐟",15.53,5.82],["Marlin","🐟",118.58,1.52],["Oarfish","🐍",81.5,2.03],["Mola","🐡",142.47,1.01],["Beluga","🦈",109.41,1.44],["Goliath","🐟",118.65,1.77]];
-const VAR=["Pond", "Muddy", "Little", "Plain", "Dusky", "Creek", "Reed", "Stubby", "Drab", "Pebble", "River", "Brook", "Swift", "Banded", "Lined", "Sandy", "Rusty", "Slender", "Hardy", "Cedar", "Silver", "Copper", "Steel", "Bronze", "Pearl", "Opal", "Ivory", "Jade", "Mirror", "Lantern", "Spotted", "Striped", "Leopard", "Tiger", "Zebra", "Marbled", "Painted", "Speckled", "Checkered", "Ribbon", "Mossy", "Thorned", "Ancient", "Giant", "Hooded", "Horned", "Bearded", "Armored", "Whiskered", "Sunken", "Golden", "Amber", "Solar", "Gilded", "Sunfire", "Royal", "Radiant", "Honeyed", "Saffron", "Blazing", "Crystal", "Frozen", "Starlit", "Moonlit", "Glass", "Prism", "Aurora", "Diamond", "Spirit", "Phantom", "Mythic", "Abyssal", "Celestial", "Eternal", "Void", "Dragon", "Titan", "Elder", "Cosmic", "Primal"];
+const SP=[["Minnow","🐟",0.1,40],["Perch","🐠",0.6,25],["Carp","🐟",3,12],["Trout","🐟",1.5,22],["Catfish","🐡",5,10],["Bass","🐟",2,20],["Pike","🦈",4,8],["Eel","🐍",1.2,30],["Salmon","🐟",4.5,12],["Sturgeon","🐟",18,6],["Koi","🐠",2.5,25],["Tuna","🐟",25,5],["Swordfish","🦈",40,4],["Anglerfish","🐡",8,12],["Guppy","🐠",0.044,346.52],["Molly","🐠",0.136,170.52],["Tetra","🐠",0.124,130.33],["Betta","🐠",0.12,141.22],["Goby","🐠",0.03,223.36],["Blenny","🐠",0.128,110.75],["Killifish","🐠",0.112,83.23],["Stickleback","🐠",0.072,351.41],["Gudgeon","🐟",0.127,199.39],["Bleak","🐠",0.117,58.84],["Dace","🐠",0.065,121.81],["Smelt","🐠",0.033,589.88],["Anchovy","🐠",0.085,81.21],["Sardine","🐠",0.134,102.14],["Damselfish","🐠",0.078,201.24],["Clownfish","🐠",0.098,254.76],["Pipefish","🐟",0.099,207.91],["Roach","🐡",1.17,33.34],["Rudd","🐠",0.39,110.67],["Chub","🐟",0.43,126.03],["Loach","🐠",0.86,42.04],["Bluegill","🐡",0.94,61.03],["Sunfish","🐠",0.53,63.9],["Pumpkinseed","🐡",0.79,55.97],["Crappie","🐠",0.73,74.28],["Herring","🐟",0.48,108.3],["Shad","🐡",0.33,134.98],["Mullet","🐠",1.16,43.81],["Wrasse","🐡",0.62,40.86],["Tang","🐠",0.74,52.0],["Angelfish","🐠",1.03,39.25],["Discus","🐠",1.05,28.79],["Oscar","🐡",0.69,68.29],["Archerfish","🐟",0.53,105.26],["Mudskipper","🐠",1.17,44.82],["Sculpin","🐠",1.15,38.49],["Whitefish","🐠",0.63,39.84],["Cisco","🐟",0.43,129.24],["Grayling","🐟",0.3,137.93],["Pompano","🐟",0.85,29.71],["Tilapia","🐠",0.86,56.56],["Boxfish","🐡",0.9,48.54],["Piranha","🐟",0.3,149.75],["Bream","🐠",4.96,18.06],["Tench","🐡",4.6,19.33],["Barbel","🐡",2.5,26.67],["Walleye","🐟",5.44,11.31],["Zander","🐟",3.38,11.73],["Burbot","🐠",5.03,17.39],["Mackerel","🐟",3.78,14.35],["Bonito","🐟",3.84,10.97],["Snapper","🐟",5.81,9.37],["Cod","🐠",1.73,29.8],["Haddock","🐟",5.71,15.62],["Pollock","🐠",3.8,13.25],["Flounder","🐠",3.53,24.73],["Sole","🐟",5.77,11.4],["Plaice","🐠",2.19,28.53],["Turbot","🐟",4.31,13.59],["Parrotfish","🐠",4.55,7.43],["Pufferfish","🐡",1.65,42.71],["Lionfish","🐠",1.7,37.65],["Stonefish","🐡",3.53,21.86],["Scorpionfish","🐟",3.68,19.67],["Trevally","🐡",2.08,30.3],["Sweetlips","🐡",5.53,6.92],["Hake","🐠",5.3,10.21],["Ling","🐠",3.9,21.69],["Lamprey","🐍",2.87,17.9],["Bowfin","🐠",3.59,25.83],["Dorado","🐡",2.79,14.6],["Pacu","🐡",3.67,10.13],["Muskie","🐟",33.49,3.88],["Gar","🦈",15.4,9.12],["Grouper","🐟",28.66,3.46],["Halibut","🐟",38.76,2.45],["Skate","🦈",19.25,6.25],["Ray","🦈",11.51,10.55],["Barramundi","🐟",26.23,4.22],["Barracuda","🦈",11.25,7.77],["Amberjack","🦈",13.48,8.86],["Wahoo","🐟",31.12,2.62],["Sailfish","🐟",24.21,3.63],["Arapaima","🦈",17.31,5.32],["Opah","🦈",16.2,4.22],["Coelacanth","🐟",21.26,3.21],["Paddlefish","🐟",15.53,5.82],["Marlin","🐟",118.58,1.52],["Oarfish","🐍",81.5,2.03],["Mola","🐡",142.47,1.01],["Beluga","🦈",109.41,1.44],["Goliath","🐟",118.65,1.77],["Danio","🐟",0.133,109.19],["Rasbora","🐠",0.104,131.92],["Platy","🐠",0.052,311.97],["Cardinalfish","🐠",0.049,366.74],["Dartfish","🐟",0.044,186.8],["Ide","🐡",0.46,51.49],["Ruffe","🐡",0.51,97.0],["Bitterling","🐟",0.87,68.35],["Gourami","🐠",1.12,29.88],["Cichlid","🐡",1.1,37.88],["Hatchetfish","🐠",0.62,58.24],["Barb","🐠",0.96,56.17],["Triggerfish","🐠",4.21,15.41],["Surgeonfish","🐠",1.85,49.62],["Hogfish","🐟",2.65,37.1],["Rockfish","🐟",5.6,11.53],["Tilefish","🐠",5.47,14.88],["Sablefish","🐟",4.5,14.14],["Arowana","🐠",3.73,10.44],["Cobia","🐟",21.28,6.75],["Sterlet","🐟",35.9,2.86],["Kingfish","🦈",24.92,3.19],["Taimen","🦈",139.11,0.96],["Bluefin","🦈",60.13,2.13]];
+const VAR=["Pond", "Muddy", "Little", "Plain", "Dusky", "Creek", "Reed", "Stubby", "Drab", "Pebble", "Shallow", "Tiny", "Mellow", "Ordinary", "Weedy", "River", "Brook", "Swift", "Banded", "Lined", "Sandy", "Rusty", "Slender", "Hardy", "Cedar", "Meadow", "Willow", "Thistle", "Clover", "Fern", "Silver", "Copper", "Steel", "Bronze", "Pearl", "Opal", "Ivory", "Jade", "Mirror", "Lantern", "Tin", "Quartz", "Zinc", "Nickel", "Chrome", "Spotted", "Striped", "Leopard", "Tiger", "Zebra", "Marbled", "Painted", "Speckled", "Checkered", "Ribbon", "Dotted", "Barred", "Flecked", "Freckled", "Tabby", "Mossy", "Thorned", "Ancient", "Giant", "Hooded", "Horned", "Bearded", "Armored", "Whiskered", "Sunken", "Craggy", "Barnacled", "Gnarled", "Scarred", "Rooted", "Golden", "Amber", "Solar", "Gilded", "Sunfire", "Royal", "Radiant", "Honeyed", "Saffron", "Blazing", "Auric", "Sundrenched", "Marigold", "Gilt", "Citrine", "Crystal", "Frozen", "Starlit", "Moonlit", "Glass", "Prism", "Aurora", "Diamond", "Spirit", "Phantom", "Opaline", "Sapphire", "Glacial", "Twilight", "Mirage", "Mythic", "Abyssal", "Celestial", "Eternal", "Void", "Dragon", "Titan", "Elder", "Cosmic", "Primal", "Eldritch", "Nebula", "Leviathan", "Sovereign", "Timeless"];
 const MARKS=["Dawn","Noon","Dusk","Midnight","Pond","Bayou","Glacier","Cavern"],TIERN=["Common I","Common II","Uncommon I","Uncommon II","Rare","Epic","Legendary","Mythic","Platinum"];
-const NSP=SP.length,NV=80,NM=8,TOTAL=NV*NSP*NM;
+const NSP=SP.length,NV=120,TV=15,NM=8,TOTAL=NV*NSP*NM;   // TV = variants per rarity tier
 const KOI=SP.findIndex(x=>x[0]==="Koi"),DEV=TOTAL;   // DEV = the one and only Platinum fish, "Devanshu"
-const fi=id=>{if(id===DEV)return{v:80,s:KOI,m:0,a:8};const v=id/(NSP*NM)|0;return{v,s:(id/NM|0)%NSP,m:id%NM,a:v/10|0}};
+const fi=id=>{if(id===DEV)return{v:NV,s:KOI,m:0,a:8};const v=id/(NSP*NM)|0;return{v,s:(id/NM|0)%NSP,m:id%NM,a:v/TV|0}};
 const PM=.17;   // fish price multiplier (economy rebalance)
 const BAITS=[
  {id:"worm",n:"Worm",e:"🪱",price:10,luck:0,size:1,d:"Plain and cheap."},
@@ -407,15 +407,21 @@ const fem=id=>SP[fi(id).s][1];
 
 /* ---------- save ---------- */
 const KEY="shunkpond.v1";
-let S={shunk:50,baits:{},bag:[],dex:{},day:"",sel:"worm",caught:0,lake:"pond",time:"auto",lakes:{pond:1},fails:0,v:3,recent:[],rw:[0,0,0,0,0,0],up:{reel:0,line:0,lure:0,box:0},items:{food:0},tanks:null,tk:0};
+let S={shunk:50,baits:{},bag:[],dex:{},day:"",sel:"worm",caught:0,lake:"pond",time:"auto",lakes:{pond:1},fails:0,v:4,recent:[],rw:[0,0,0,0,0,0],up:{reel:0,line:0,lure:0,box:0},items:{food:0},tanks:null,tk:0};
 try{const raw=JSON.parse(localStorage.getItem(KEY)||"{}");
-  if(raw.dex&&!raw.v){const cv=o=>(Math.floor(o/14)*10*NSP+o%14)*8+1,nd={};for(const k in raw.dex)nd[cv(+k)]=raw.dex[k];raw.dex=nd;(raw.bag||[]).forEach(f=>f.id=cv(f.id));raw.v=2}
+  if(raw.dex&&!raw.v){const cv=o=>(Math.floor(o/14)*10*106+o%14)*8+1,nd={};for(const k in raw.dex)nd[cv(+k)]=raw.dex[k];raw.dex=nd;(raw.bag||[]).forEach(f=>f.id=cv(f.id));raw.v=2}
   if(raw.v===2){   // v3: economy rebalance, bait box limit, tanks
     const OLD={worm:15,cricket:40,shrimp:90,glow:200,fly:500};let refund=0;raw.baits=raw.baits||{};
     for(const k in OLD){const n=raw.baits[k]||0;if(n>50){refund+=(n-50)*OLD[k];raw.baits[k]=50}}
     raw.shunk=(raw.shunk||0)+refund;
     const sc=f=>{if(f.id!==DEV)f.p=Math.max(1,Math.round(f.p*PM))};(raw.bag||[]).forEach(sc);(raw.aq||[]).forEach(sc);
     raw.tanks=[{theme:"classic",fish:raw.aq||[],decor:[],eggs:[],t:Date.now()}];delete raw.aq;raw.tk=0;raw.v=3;window.__refund=refund}
+  if(raw.v===3){   // v4: 124,800 fish. Same fish, new numbering (130 species, 15 variants per rarity tier)
+    const ON=106,OLD_DEV=67840,cvv=o=>{if(o===OLD_DEV)return DEV;const v=Math.floor(o/(ON*8)),s2=Math.floor(o/8)%ON,m=o%8;return((Math.floor(v/10)*TV+v%10)*NSP+s2)*8+m};
+    const nd={};for(const k in raw.dex||{})nd[cvv(+k)]=raw.dex[k];raw.dex=nd;
+    (raw.bag||[]).forEach(f=>f.id=cvv(f.id));raw.recent=(raw.recent||[]).map(cvv);
+    (raw.tanks||[]).forEach(t=>{(t.fish||[]).forEach(f=>f.id=cvv(f.id));(t.eggs||[]).forEach(e=>e.id=cvv(e.id));t.dirt=0;t.dt=Date.now()});   // moss starts fresh
+    raw.v=4}
   Object.assign(S,raw)}catch(e){}
 S.pearls=S.pearls||0;if(!S.charm)S.charm={luck:0,hook:0};if(!S.dg)S.dg={o2:0,fin:0,mag:0};if(!S.dive)S.dive={count:0,best:{}};
 if(!S.up)S.up={};["reel","line","lure","box"].forEach(k=>{S.up[k]=S.up[k]||0});if(!S.items)S.items={food:0};
@@ -477,8 +483,8 @@ document.addEventListener("click",e=>{
       S.lake=L.id}
     save();render();applyScene();return}
   if(t.dataset.fort){if(spinning||!S.bag[+t.dataset.fort]||S.bag[+t.dataset.fort].id===DEV)return;fobj=S.bag[+t.dataset.fort];$("#fortRes").textContent="Ready. Pull the lever or press SPIN.";render();return}
-  if(t.dataset.aqadd){const f=S.bag[+t.dataset.aqadd];if(!f)return;if(S.aq.length>=5)return toast("The aquarium is full (5 fish). Put one back in your bag first.");S.bag.splice(+t.dataset.aqadd,1);S.aq.push(f);save();render();toast(fname(f.id)+" is now swimming in your aquarium.");return}
-  if(t.dataset.aqout){const f=S.aq[+t.dataset.aqout];if(!f)return;S.aq.splice(+t.dataset.aqout,1);S.bag.push(f);save();render();toast("Back in your bag.");return}
+  if(t.dataset.aqadd){const f=S.bag[+t.dataset.aqadd];if(!f)return;if(S.aq.length>=5)return toast("The aquarium is full (5 fish). Put one back in your bag first.");settle(tk());S.bag.splice(+t.dataset.aqadd,1);S.aq.push(f);save();render();toast(fname(f.id)+" is now swimming in your aquarium.");return}
+  if(t.dataset.aqout){const f=S.aq[+t.dataset.aqout];if(!f)return;settle(tk());S.aq.splice(+t.dataset.aqout,1);S.bag.push(f);save();render();toast("Back in your bag.");return}
   if(t.dataset.bait){if(st==="idle"||st==="done"){S.sel=t.dataset.bait;save();render()}return}
   if(t.dataset.buy){const[id,n]=t.dataset.buy.split(":"),b=BAITS.find(x=>x.id===id),room=boxCap()-(S.baits[id]||0);
     const k=n==="max"?Math.min(room,Math.floor(S.shunk/b.price)):Math.min(+n,room);
@@ -490,7 +496,7 @@ document.addEventListener("click",e=>{
   if(t.dataset.tk){S.tk=+t.dataset.tk;par=[];aqSel=null;tagContent();save();render();return}
   if(t.dataset.buytank){const i=S.tanks.length,T=TANKS[i];if(!T)return;if(S.shunk<T.cost)return toast("A new tank costs "+T.cost.toLocaleString()+" shunk.");
     return ask("Buy the "+T.n+"?","<p>A second place for 5 more fish, with its own look, decorations and tips. Fish of the <b>"+MARKS[T.strain]+"</b> strain feel at home here (+2 appeal each).</p><p>Costs <b>"+T.cost.toLocaleString()+" shunk</b>.</p>","Buy tank",()=>{if(S.shunk<T.cost)return;S.shunk-=T.cost;S.tanks.push({theme:T.theme,fish:[],decor:[],eggs:[],t:Date.now()});S.tk=i;par=[];play("record");save();render();toast(T.n+" is ready!")})}
-  if(t.dataset.deco){const id=t.dataset.deco,D=DECOR[id],tkk=tk();if(tkk.decor.includes(id))return;if(D.pearls){if((S.pearls||0)<D.pearls)return toast("You need "+D.pearls+" pearls. Go diving!");S.pearls-=D.pearls}else{if(S.shunk<D.cost)return toast("Not enough shunk.");S.shunk-=D.cost}tkk.decor.push(id);play("coin");save();render();toast(D.n+" added to the tank.");return}
+  if(t.dataset.deco){const id=t.dataset.deco,D=DECOR[id],tkk=tk();if(tkk.decor.includes(id))return;if(D.pearls){if((S.pearls||0)<D.pearls)return toast("You need "+D.pearls+" pearls. Go diving!");S.pearls-=D.pearls}else{if(S.shunk<D.cost)return toast("Not enough shunk.");S.shunk-=D.cost}settle(tkk);tkk.decor.push(id);play("coin");save();render();toast(D.n+" added to the tank.");return}
   if(t.dataset.par){const i=+t.dataset.par;par=par.includes(i)?par.filter(x=>x!==i):[...par,i].slice(-2);render();return}
   if(t.dataset.breed){startBreed();return}
   if(t.dataset.hatch){hatchEgg();return}
@@ -528,6 +534,9 @@ const SFX={
  big:(c,t)=>{SFX.catch(c,t);[1047,1319,1568,2093].forEach((f,i)=>tone(c,t+.4+i*.08,f,f,.3,"triangle",.17))},
  gong:(c,t)=>{tone(c,t,140,70,1.4,"sine",.3);tone(c,t,280,140,1.1,"triangle",.12);noise(c,t,.4,300,900,.12)},
  golden:(c,t)=>{SFX.record(c,t);[1568,2093,2637,3136].forEach((f,i)=>tone(c,t+.9+i*.1,f,f,.5,"triangle",.14))},
+ quack:(c,t)=>{tone(c,t,560,380,.09,"square",.08);tone(c,t+.12,520,340,.1,"square",.07)},
+ bonk:(c,t)=>{tone(c,t,240,130,.1,"sine",.16);tone(c,t+.02,480,260,.06,"triangle",.06)},
+ clack:(c,t)=>{tone(c,t,1800,900,.03,"square",.06);tone(c,t+.07,1800,900,.03,"square",.06);tone(c,t+.14,1800,900,.03,"square",.06)},
  plip:(c,t)=>{tone(c,t,900,420,.05,"sine",.08)},
  plink:(c,t)=>{tone(c,t,1250,1600,.08,"sine",.08);tone(c,t+.06,1800,1800,.1,"sine",.04)},
  nom:(c,t)=>{tone(c,t,320,170,.07,"square",.07);tone(c,t+.08,260,140,.06,"square",.05)},
@@ -621,7 +630,7 @@ function roll(b){
   const sw=SP.map((_,i)=>L.fi.includes(i)?10:1);let q=R()*sw.reduce((x,y)=>x+y),s=0;while(s<SP.length-1&&(q-=sw[s])>0)s++;
   const ti=TIMES.indexOf(T),li=LAKES.indexOf(L),mw=MARKS.map((_,i)=>1+(i===ti?5:0)+(i===4+li?5:0));
   let z=R()*mw.reduce((x,y)=>x+y),m=0;while(m<7&&(z-=mw[m])>0)m++;
-  const v=a*10+(R()*10|0);
+  const v=a*TV+(R()*TV|0);
   const w=+(SP[s][2]*(.5+R()*1.2)*(1+a*.08)*Math.sqrt(b.size*X.size)).toFixed(2);
   return{id:(v*NSP+s)*NM+m,w,p:Math.max(1,Math.round(w*SP[s][3]*ADJ[a][2]*PM))};
 }
@@ -670,7 +679,7 @@ function eggCheck(){
   S.baits.sac=1;S.sacGiven=true;S.sel="sac";save();render();play("golden");
   modal("The water goes still…","<p>You have caught <b>every one of the "+EGG_NEED.toLocaleString()+" Mythic fish</b>.</p><p>Something ancient has noticed you, and leaves a single <b>Sacrificial Bait</b> on your line.</p><p>Use it, and a legend will bite. Catch him and he is yours. Fail, and your Mythic progress is gone.</p><p class='muted'>You only get one.</p>",[["I understand",null,1]],"gold");
 }
-window.__eggTest=()=>{for(let v=70;v<80;v++)for(let s=0;s<NSP;s++)for(let m=0;m<NM;m++)S.dex[(v*NSP+s)*NM+m]=1;save();render();eggCheck()};   // tester shortcut: marks every Mythic fish as caught
+window.__eggTest=()=>{for(let v=7*TV;v<8*TV;v++)for(let s=0;s<NSP;s++)for(let m=0;m<NM;m++)S.dex[(v*NSP+s)*NM+m]=1;save();render();eggCheck()};   // tester shortcut: marks every Mythic fish as caught
 function reelInit(c){
   if(c.id===DEV)return{d:1,zs:.11,y:.3,v:0,f:.5,tg:.5,t:1,p:30,age:0,jr:.5,ap:4.5,ls:18,gn:26};   // hard on purpose, but a focused player can win
   const X=fx(),a=fi(c.id).a,d=Math.min(1,.1+a*.1+Math.min(c.w/60,.2)),beh=behOf(c);
@@ -784,8 +793,8 @@ H.forEach((h,i)=>setPos(i,0));
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const AW=320,AH=180,AB={x0:24,x1:296,y0:46,y1:143};   // swim box inside the tank picture
 const BT={};   // body types: 0 normal, 1 round, 2 long, 3 flat
-"Eel Pike Gar Lamprey Oarfish Barracuda Wahoo Sailfish Marlin Swordfish Pipefish Muskie Bowfin Burbot Loach".split(" ").forEach(n=>BT[n]=2);
-"Perch Bluegill Sunfish Pumpkinseed Crappie Angelfish Discus Oscar Boxfish Pufferfish Mola Opah Tang Damselfish Clownfish Betta Piranha Pacu Koi Anglerfish Stonefish".split(" ").forEach(n=>BT[n]=1);
+"Eel Pike Gar Lamprey Oarfish Barracuda Wahoo Sailfish Marlin Swordfish Pipefish Muskie Bowfin Burbot Loach Cobia Sterlet Kingfish Taimen Danio Rasbora".split(" ").forEach(n=>BT[n]=2);
+"Perch Bluegill Sunfish Pumpkinseed Crappie Angelfish Discus Oscar Boxfish Pufferfish Mola Opah Tang Damselfish Clownfish Betta Piranha Pacu Koi Anglerfish Stonefish Gourami Cichlid Triggerfish Surgeonfish Hogfish Hatchetfish Platy".split(" ").forEach(n=>BT[n]=1);
 "Flounder Sole Plaice Turbot Halibut Skate Ray".split(" ").forEach(n=>BT[n]=3);
 const BILL={Swordfish:1,Marlin:1,Sailfish:1};
 const hs=n=>{n=Math.imul(n^(n>>>15),2246822507);n=Math.imul(n^(n>>>13),3266489909);return(n^(n>>>16))>>>0};
@@ -797,7 +806,7 @@ function makeSprite(f){
   let L=Math.max(13,Math.min(46,Math.round(13+Math.sqrt(f.w)*6)));if(ty===2)L=Math.round(L*1.35);
   const Hh=Math.max(4,Math.round(L*[.34,.56,.17,.3][ty])),tw=Math.max(3,Math.round(L*.26)),fh=Math.max(2,Math.round(Hh*.42)),bill=BILL[nm]?Math.round(L*.3):0;
   const W=L+tw+bill+2,Ht=Hh+fh*2+8,cy=Math.round(Ht/2);
-  const vi=q.v%10,hue=a===8?46:a===5?30+vi*3:a===6?170+vi*12:a===7?280+vi*8:hs(q.v*7919+3)%360;
+  const vi=q.v%TV,hue=a===8?46:a===5?30+vi*3:a===6?170+vi*12:a===7?280+vi*8:hs(q.v*7919+3)%360;
   const sat=[28,36,14,58,44,92,82,92,100][a],lig=[42,48,72,52,40,56,66,62,58][a];
   const col=`hsl(${hue} ${sat}% ${lig}%)`,bel=`hsl(${hue} ${Math.max(10,sat-10)}% ${Math.min(92,lig+26)}%)`,fin=`hsl(${(hue+q.m*18)%360} ${Math.min(95,sat+14)}% ${Math.max(24,lig-10)}%)`,out=`hsl(${hue} ${Math.min(55,sat)}% 13%)`;
   const pat=a===3?q.v%3:-1,bl=L-1,frames=[];
@@ -834,23 +843,87 @@ const nameOf=f=>f.pet||fname(f.id);
 function pickTarget(a){const hw=a.sp.W/2,hh=a.sp.Ht/2;a.tx=AB.x0+hw+R()*(AB.x1-AB.x0-2*hw);let y0=AB.y0+hh+4,y1=AB.y1-hh;
   if(a.bt===3)y0=y1-5;else if(a.bt===2&&R()<.5)y0=(y0+y1)/2;a.tgy=y0+R()*Math.max(1,y1-y0)}
 function aquaSync(){
+  toySync();
   for(let i=AQ.length-1;i>=0;i--)if(!S.aq.includes(AQ[i].f)){if(aqSel===AQ[i])aqSel=null;AQ.splice(i,1)}
   S.aq.forEach(f=>{if(AQ.some(a=>a.f===f))return;
     const sp=spriteFor(f),q=fi(f.id),face=R()<.5?1:-1;
-    const a={f,sp,L:sp.L,bt:BT[SP[q.s][0]]||0,x:AB.x0+30+R()*(AB.x1-AB.x0-60),y:AB.y0+20+R()*(AB.y1-AB.y0-40),vx:0,vy:0,sx:face,face,ph:R()*4,t:0,bob:R()*6,pause:R()*1.5,speed:Math.max(18,Math.min(52,60-sp.L*.9)),nb:4+R()*8,aura:q.a===8?48:q.a>=6?(q.a===7?300:190)+(q.v%10)*8:null};
+    const a={f,sp,L:sp.L,bt:BT[SP[q.s][0]]||0,x:AB.x0+30+R()*(AB.x1-AB.x0-60),y:AB.y0+20+R()*(AB.y1-AB.y0-40),vx:0,vy:0,sx:face,face,ph:R()*4,t:0,bob:R()*6,pause:R()*1.5,speed:Math.max(18,Math.min(52,60-sp.L*.9)),nb:4+R()*8,aura:q.a===8?48:q.a>=6?(q.a===7?300:190)+(q.v%TV)*8:null};
     pickTarget(a);AQ.push(a)});
 }
 function bubble(x,y,z){BUB.push({x,y,v:9+R()*10,w:R()*6,r:R()<.3?2:1,z})}
+/* toys: decorations that move. You can tap, drag and flick them, and fish play with them too */
+const TOYDEF={ball:{r:7},duck:{r:7},orb:{r:8},hoop:{r:12},crab:{r:7},musicbox:{r:9}},TOY={},NOTES=[];
+let toyDrag=null,lastPing=0,aqPlay=12+Math.random()*10;
+const SANDY=()=>AB.y1+2,toyPing=n=>{const t=performance.now();if(t-lastPing>450){lastPing=t;play(n||"plink")}};
+function toySync(){
+  const ids=S.tanks[S.tk].decor.filter(id=>TOYDEF[id]);
+  for(const k in TOY)if(!ids.includes(k))delete TOY[k];
+  ids.forEach(id=>{if(TOY[id])return;const sx={ball:150,duck:112,hoop:208,crab:150,orb:72,musicbox:236}[id];
+    TOY[id]={id,x:sx,y:id==="duck"?AB.y0+1:id==="crab"||id==="musicbox"?SANDY()-4:id==="hoop"?96:id==="orb"?80:72,vx:0,vy:0,t:Math.random()*5,face:1,dance:0,note:0,drag:false}})}
+function playMelody(o){
+  o.note=3.3;const seq=[523,659,784,659,880,784,659,523,587,698,880,698];
+  seq.forEach((f,i)=>setTimeout(()=>snd((c,t)=>{tone(c,t,f,f,.45,"triangle",.09);tone(c,t,f*2,f*2,.3,"sine",.03)}),i*270));
+  aqAttr={x:o.x,y:o.y-16,t:performance.now()+3600}}
+function toyTap(o){
+  if(o.id==="ball"){o.vy-=42;o.vx+=(Math.random()-.5)*50;play("bonk")}
+  else if(o.id==="duck"){o.vy-=48;o.vx+=(Math.random()-.5)*30;play("quack");for(let i=0;i<3;i++)SPK.push({x:o.x+(Math.random()-.5)*10,y:o.y-8,l:.7,h:50})}
+  else if(o.id==="crab"){o.dance=1.8;o.vy=-55;play("clack");for(let i=0;i<4;i++)bubble(o.x+(Math.random()-.5)*10,o.y-6)}
+  else if(o.id==="musicbox")playMelody(o);
+  else if(o.id==="orb"){o.pulse=1;play("pearl");aqAttr={x:o.x,y:o.y,t:performance.now()+3000}}
+  else if(o.id==="hoop"){ripple(o.x,o.y);play("plink")}}
+function endToyDrag(){
+  if(!toyDrag)return;const o=toyDrag.o,h=toyDrag.hist,now=performance.now();o.drag=false;
+  if(toyDrag.moved<5&&now-toyDrag.t<420)toyTap(o);
+  else if(["ball","duck","orb"].includes(o.id)&&h.length>1){const a=h[0],b=h[h.length-1],dt=Math.max(.03,(b[0]-a[0])/1000);o.vx=Math.max(-110,Math.min(110,(b[1]-a[1])/dt*.6));o.vy=Math.max(-110,Math.min(110,(b[2]-a[2])/dt*.6))}
+  toyDrag=null}
+function hoopCheer(a,o){const T=S.tanks[S.tk];T.play=(T.play||0)+1;toyPing("pearl");for(let i=0;i<8;i++){const an=i/8*Math.PI*2;SPK.push({x:o.x+Math.cos(an)*5,y:o.y+Math.sin(an)*13,l:.8,h:50})}}
+function startPlay(){
+  const ids=Object.keys(TOY).filter(id=>id!=="musicbox");if(!ids.length||!AQ.length||!lightsOn())return;
+  const free=AQ.filter(a=>!a.play&&!a.air&&!a.hop&&!(a.boost>0));if(!free.length)return;
+  free[Math.random()*free.length|0].play={id:ids[Math.random()*ids.length|0],stage:0,t:8,n:0,cool:0}}
+function toysStep(dt){
+  for(const id in TOY){const o=TOY[id],r=TOYDEF[id].r;o.t+=dt;if(o.pulse>0)o.pulse-=dt;if(o.note>0)o.note-=dt;
+    if(o.drag)continue;
+    if(id==="ball"){o.vy-=14*dt;o.vx*=Math.exp(-.7*dt);o.vy*=Math.exp(-.9*dt)}
+    else if(id==="duck"){o.vy+=((AB.y0+1)-o.y)*5*dt-o.vy*3*dt;o.vx+=Math.sin(o.t*.35+3)*3*dt;o.vx*=Math.exp(-.5*dt);if(Math.abs(o.vx)>1)o.face=o.vx>0?1:-1}
+    else if(id==="orb"){o.vx+=Math.sin(o.t*.31)*6*dt;o.vy+=Math.cos(o.t*.43)*5*dt;o.vx*=Math.exp(-.8*dt);o.vy*=Math.exp(-.8*dt)}
+    else if(id==="crab"){if(o.dance>0)o.dance-=dt;else{o.cd=(o.cd||0)-dt;if(o.cd<=0){o.cd=2+Math.random()*3;o.face=Math.random()<.5?-1:1;o.sp=Math.random()<.3?0:10+Math.random()*8}o.vx=o.face*(o.sp||0)}o.vy+=170*dt}
+    else if(id==="musicbox"){o.vx*=Math.exp(-5*dt);o.vy+=170*dt}
+    else if(id==="hoop"){o.vx*=.9;o.vy*=.9}
+    o.x+=o.vx*dt;o.y+=o.vy*dt;
+    if(o.x<AB.x0+r){o.x=AB.x0+r;o.vx=Math.abs(o.vx)*.6;if(id==="crab")o.face=1}
+    if(o.x>AB.x1-r){o.x=AB.x1-r;o.vx=-Math.abs(o.vx)*.6;if(id==="crab")o.face=-1}
+    const floor=(id==="crab"||id==="musicbox")?SANDY()-4:AB.y1-r;if(o.y>floor){o.y=floor;o.vy=id==="ball"?-Math.abs(o.vy)*.5:0}
+    const top=id==="duck"?AB.y0-11:AB.y0+r-2;if(o.y<top){o.y=top;o.vy=Math.max(o.vy,0)*.2}
+    if(o.note>0&&Math.random()<dt*7)NOTES.push({x:o.x+(Math.random()-.5)*8,y:o.y-8,l:1.2,h:Math.random()*360});
+    if(["ball","duck","orb"].includes(id))AQ.forEach(a=>{if(a.air)return;const d=Math.hypot(a.x-o.x,a.y-o.y);if(d<r+a.L*.35){const nx=(o.x-a.x)/(d||1),ny=(o.y-a.y)/(d||1);o.vx+=nx*14+a.vx*.3;o.vy+=ny*10+a.vy*.3;if(Math.random()<.25)toyPing("plink")}})}
+  for(let i=NOTES.length-1;i>=0;i--){const n=NOTES[i];n.y-=14*dt;n.x+=Math.sin(n.y*.2)*.2;n.l-=dt;if(n.l<=0)NOTES.splice(i,1)}
+  aqPlay-=dt;if(aqPlay<=0){aqPlay=16+Math.random()*20;startPlay()}}
+function drawToys(x){
+  for(const id in TOY){const o=TOY[id],t=o.t;x.save();x.translate(Math.round(o.x),Math.round(o.y));
+    if(id==="ball"){x.rotate(t*.8*(o.vx>=0?1:-1));x.fillStyle="#fff";x.beginPath();x.arc(0,0,7,0,7);x.fill();["#e8574a","#4a8fe8","#f2c230","#4cc26a"].forEach((c,k)=>{x.fillStyle=c;x.beginPath();x.moveTo(0,0);x.arc(0,0,7,k*Math.PI/2,k*Math.PI/2+Math.PI/4);x.fill()});x.strokeStyle="#2a2a2a";x.lineWidth=.8;x.beginPath();x.arc(0,0,7,0,7);x.stroke()}
+    if(id==="duck"){x.scale(o.face||1,1);x.fillStyle="#f6d230";x.fillRect(-7,-2,13,6);x.fillRect(-5,-4,9,2);x.fillRect(3,-8,6,6);x.fillStyle="#f29a2c";x.fillRect(9,-5,4,2);x.fillStyle="#c9a010";x.fillRect(-4,0,6,3);x.fillStyle="#222";x.fillRect(6,-7,1,1);x.fillStyle="#fff7";x.fillRect(-8,3,16,1)}
+    if(id==="hoop"){x.strokeStyle="#c9922a";x.lineWidth=3;x.beginPath();x.ellipse(0,0,5,13,0,0,7);x.stroke();x.strokeStyle="#ffd25a";x.lineWidth=1.6;x.beginPath();x.ellipse(0,0,5,13,0,0,7);x.stroke();x.fillStyle="#fff3b0";x.fillRect(-1,-14,2,2)}
+    if(id==="crab"){const dn=o.dance>0,j=dn?-Math.abs(Math.sin(t*12))*4:0,w=Math.sin(t*10)*1.2;x.translate(0,j);x.fillStyle="#e0472f";x.fillRect(-6,-3,12,6);x.fillStyle="#c23a26";x.fillRect(-4,-4,8,2);x.fillStyle="#e0472f";
+      x.fillRect(-10,dn?-9:-5,3,3);x.fillRect(7,dn?-9:-5,3,3);x.fillRect(-9,-2,3,1);x.fillRect(6,-2,3,1);x.fillStyle="#b03020";for(let k=0;k<3;k++){x.fillRect(-7-k*0,1+k*1.2+w,1,2);x.fillRect(6,1+k*1.2-w,1,2)}x.fillStyle="#fff";x.fillRect(-3,-6,1,2);x.fillRect(2,-6,1,2);x.fillStyle="#222";x.fillRect(-3,-6,1,1);x.fillRect(2,-6,1,1)}
+    if(id==="musicbox"){x.fillStyle="#8a5a2c";x.fillRect(-8,-4,16,8);x.fillStyle="#6b4420";x.fillRect(-9,-6,18,3);x.fillStyle="#e0b030";x.fillRect(-8,-1,16,1);x.save();x.translate(10,-1);x.rotate(o.note>0?t*6:0);x.fillStyle="#bbb";x.fillRect(-1,-3,2,6);x.restore()}
+    if(id==="orb"){x.fillStyle="#bff4ff";x.beginPath();x.arc(0,0,4,0,7);x.fill();x.fillStyle="#fff";x.fillRect(-2,-2,2,2)}
+    x.restore()}
+  NOTES.forEach(n=>{x.fillStyle=`hsla(${n.h},90%,75%,${Math.min(1,n.l*1.4)})`;x.font="8px monospace";x.fillText("♪",n.x|0,n.y|0)})}
+function drawToyGlow(x,dark){
+  const o=TOY.orb;if(!o)return;const a=(dark?.65:.32)+.1*Math.sin(o.t*2)+(o.pulse>0?o.pulse*.4:0),g=x.createRadialGradient(o.x,o.y,1,o.x,o.y,dark?40:26);g.addColorStop(0,`rgba(170,235,255,${a})`);g.addColorStop(1,"rgba(170,235,255,0)");x.fillStyle=g;x.fillRect(o.x-42,o.y-42,84,84)}
 let aqAttr={x:0,y:0,t:0},aqPtr={x:0,y:0,px:0,py:0,t:0,down:false},aqTap={t:0,x:0,y:0},aqChase=15+R()*10,aqHop=20+R()*20,aqChest=false,cleaning=false;
 const RIP=[],lightsOn=()=>S.lights==null?!(new Date().getHours()>=22||new Date().getHours()<6):S.lights;
 const ripple=(x,y)=>RIP.push({x,y,r:1,l:1});
-const subPos=()=>{const t=performance.now()/1000;return{x:(t*9)%(AW+80)-40,y:72+Math.sin(t*.7)*6}};
+const subPosAt=t=>{const w=AB.x1-AB.x0-36,u=(t*9)%(2*w);return{x:AB.x0+18+(u<w?u:2*w-u),y:AB.y0+26+Math.sin(t*.7)*6,dir:u<w?1:-1}};   // sails back and forth inside the tank
+const jellyAt=(k,t)=>({x:AB.x0+28+(AB.x1-AB.x0-56)*(.5+.5*Math.sin(t*.21+k*2.3)),y:AB.y0+26+(AB.y1-AB.y0-66)*(.5+.5*Math.sin(t*.37+k*1.7))});
+const subPos=()=>subPosAt(performance.now()/1000);
 const DIRTB=Array.from({length:70},(_,i)=>{const r=rngSeed("algae"+i),e=r();return{x:e<.35?AB.x0-6+r()*26:e<.7?AB.x1-20+r()*26:AB.x0+r()*(AB.x1-AB.x0),y:e<.7?AB.y0+8+r()*(AB.y1-AB.y0):AB.y1-6+r()*8,s:2+(r()*4|0),k:i/70}});
 function aquaStep(dt){
   const nowMs=performance.now(),dark=!lightsOn(),T0=S.tanks[S.tk];
   AQ.forEach(a=>{
     a.t+=dt;const hw=a.sp.W/2,hh=a.sp.Ht/2;
-    if(a.spin>0)a.spin-=dt;if(a.scare>0)a.scare-=dt;if(a.boost>0)a.boost-=dt;
+    if(a.spin>0)a.spin-=dt;if(a.munch>0)a.munch-=dt;if(a.scare>0)a.scare-=dt;if(a.boost>0)a.boost-=dt;
     if(a.air){   // leaping out of the water
       a.vy+=190*dt;a.x+=a.vx*dt*.5;a.y+=a.vy*dt;
       if(a.y>=AB.y0+hh&&a.vy>0){a.air=false;a.y=AB.y0+hh;a.vy*=.2;ripple(a.x,AB.y0);play("splash");for(let i=0;i<4;i++)bubble(a.x+(R()-.5)*8,AB.y0+3)}
@@ -864,6 +937,15 @@ function aquaStep(dt){
       else if(a.chase&&a.boost>0&&AQ.includes(a.chase)){a.tx=a.chase.x-a.chase.face*8;a.tgy=a.chase.y;a.pause=0;mult=1.5}
       else if(a.hop){a.tx=a.x;a.tgy=AB.y0+hh;a.pause=0;mult=1.7;
         if(a.y<AB.y0+hh+4){a.hop=0;a.air=true;a.vy=-60;a.vx=a.face*10;play("splash");ripple(a.x,AB.y0);for(let i=0;i<5;i++)bubble(a.x+(R()-.5)*8,AB.y0+4);return}}
+      else if(a.play){const o=TOY[a.play.id],P=a.play;
+        if(!o||P.t<=0){a.play=null}
+        else{P.t-=dt;P.cool-=dt;mult=1.2;
+          if(P.id==="hoop"){if(!P.dir)P.dir=a.x<o.x?1:-1;const side=P.stage===0?o.x-P.dir*30:o.x+P.dir*30;a.tx=side;a.tgy=o.y;
+            if(P.stage===0&&Math.abs(a.x-side)<6&&Math.abs(a.y-o.y)<14)P.stage=1;
+            else if(P.stage===1&&P.dir*(a.x-o.x)>9&&Math.abs(a.y-o.y)<15){hoopCheer(a,o);a.play=null}}
+          else if(P.id==="crab"){a.tx=o.x-o.face*18;a.tgy=o.y-10}
+          else{a.tx=o.x;a.tgy=o.y;const d=Math.hypot(o.x-a.x,o.y-a.y);
+            if(d<a.L*.5+TOYDEF[P.id].r+3&&P.cool<=0){const nx=(o.x-a.x)/(d||1);o.vx+=nx*36;o.vy-=20;P.n++;P.cool=.9;T0.play=(T0.play||0)+1;toyPing("boop");for(let i=0;i<3;i++)SPK.push({x:o.x,y:o.y-6,l:.6,h:50});if(P.n>=3)a.play=null}}}}
       if(a.scare>0)mult=1.8;
       a.tx=Math.max(AB.x0+hw,Math.min(AB.x1-hw,a.tx));a.tgy=Math.max(AB.y0+hh,Math.min(AB.y1-hh,a.tgy))}
     if(dark&&!pel)mult*=.5;
@@ -881,11 +963,12 @@ function aquaStep(dt){
     a.nb-=dt;if(a.nb<=0){a.nb=dark?3+R()*4:6+R()*9;bubble(a.x+a.face*a.sp.W*.35,a.y-2,dark)}
     if(a.aura!==null&&R()<dt*3)SPK.push({x:a.x+(R()-.5)*a.sp.W,y:a.y+(R()-.5)*a.sp.Ht,l:.7,h:a.aura})
   });
+  toysStep(dt);
   aqChase-=dt;if(aqChase<=0){aqChase=24+R()*16;if(AQ.length>1&&!PEL.length&&!dark){const l=AQ[R()*AQ.length|0],f=AQ[R()*AQ.length|0];if(f!==l&&!f.air&&!l.air){f.chase=l;f.boost=l.boost=6;l.pause=0;pickTarget(l)}}}
   aqHop-=dt;if(aqHop<=0){aqHop=28+R()*22;const c=AQ.filter(a=>a.bt!==3&&a.L<34&&!a.air);if(c.length&&!dark)c[R()*c.length|0].hop=1}
   if(R()<dt*1.1)bubble(AB.x0+R()*(AB.x1-AB.x0),AB.y1-2);
   T0.decor.forEach(id=>{const dx=DECOR[id].x;if(id==="bubbler"&&R()<dt*3.5)bubble(dx+(R()-.5)*5,AB.y1-6);if(id==="chest"&&chestOpen()&&R()<dt*9)bubble(dx+(R()-.5)*8,AB.y1-10);
-    if(id==="diverfig"&&R()<dt*1.4)bubble(dx+3,AB.y1-16);if(id==="sub"&&R()<dt*4){const p=subPos();bubble(p.x-14,p.y)}});
+    if(id==="diverfig"&&R()<dt*1.4)bubble(dx+3,AB.y1-16);if(id==="sub"&&R()<dt*4){const p=subPos();bubble(p.x-14*p.dir,p.y)}});
   const co=chestOpen()&&T0.decor.includes("chest");if(co&&!aqChest&&view==="aqua")play("creak");aqChest=co;
   for(let i=PEL.length-1;i>=0;i--){const p=PEL[i];p.y=Math.min(AB.y1-1,p.y+p.vy*dt);p.x+=Math.sin(p.y*.3)*.1;p.life-=dt;if(p.life<=0)PEL.splice(i,1)}
   for(let i=BUB.length-1;i>=0;i--){const b=BUB[i];b.y-=b.v*dt;b.x+=Math.sin(b.y*.25+b.w)*.15;if(b.y<AB.y0-2)BUB.splice(i,1)}
@@ -900,7 +983,10 @@ function aquaDraw(){
   drawScenery(x);
   [...AQ].sort((a,b)=>a.y-b.y).forEach(a=>{
     if(a.aura!==null){x.globalCompositeOperation="lighter";const g=x.createRadialGradient(a.x,a.y,2,a.x,a.y,a.L*1.1);g.addColorStop(0,`hsla(${a.aura},90%,60%,.35)`);g.addColorStop(1,`hsla(${a.aura},90%,60%,0)`);x.fillStyle=g;x.fillRect(a.x-a.L*1.2,a.y-a.L*1.2,a.L*2.4,a.L*2.4);x.globalCompositeOperation="source-over"}
-    x.save();x.translate(Math.round(a.x),Math.round(a.y+(a.air?0:Math.sin(a.t*1.6+a.bob)*.8)));x.scale(a.spin>0?Math.cos((.6-a.spin)/.6*Math.PI*6):a.sx,1);
+    x.save();let lift=0,rot=0,sc=1;
+    if(a.spin>0){const q=1-a.spin/.75,e=q*q*(3-2*q);rot=a.face*e*Math.PI*2;lift=Math.sin(q*Math.PI)*7}   // one smooth somersault
+    if(a.munch>0)sc=1+.22*Math.sin((1-a.munch/.3)*Math.PI);                                              // a little puff when eating
+    x.translate(Math.round(a.x),Math.round(a.y-lift+(a.air?0:Math.sin(a.t*1.6+a.bob)*.8)));if(rot)x.rotate(rot);x.scale(a.sx*sc,sc);
     x.drawImage(a.sp.frames[Math.floor(a.ph)%4],-Math.round(a.sp.W/2),-Math.round(a.sp.Ht/2));x.restore();
     if(aqSel===a){x.strokeStyle="rgba(255,255,255,.55)";x.strokeRect(Math.round(a.x-a.sp.W/2-2)+.5,Math.round(a.y-a.sp.Ht/2-2)+.5,a.sp.W+3,a.sp.Ht+3)}
   });
@@ -920,15 +1006,19 @@ const cpos=e=>{const r=$("#tankc").getBoundingClientRect();return[(e.clientX-r.l
 function wipe(x,y){const t=tk(),d=Math.hypot(x-aqPtr.px,y-aqPtr.py),was=dirtNow(t);if(!d||was<=0)return;setDirt(t,was-d*.16);
   if(performance.now()-(wipe.s||0)>140){wipe.s=performance.now();play("sponge");bubble(x,y)}
   if(dirtNow(t)<=0){toast("Sparkling clean! Visitors will love it.");play("pearl");for(let i=0;i<8;i++)SPK.push({x:x+(R()-.5)*30,y:y+(R()-.5)*20,l:.9,h:190})}}
-$("#tankc").addEventListener("pointermove",e=>{const[x,y]=cpos(e);aqPtr.px=aqPtr.x;aqPtr.py=aqPtr.y;aqPtr.x=x;aqPtr.y=y;aqPtr.t=performance.now();if(cleaning&&aqPtr.down)wipe(x,y)});
-["pointerup","pointerleave","pointercancel"].forEach(ev=>$("#tankc").addEventListener(ev,()=>{if(aqPtr.down&&cleaning){save();tipsUpdate()}aqPtr.down=false}));
+$("#tankc").addEventListener("pointermove",e=>{const[x,y]=cpos(e);aqPtr.px=aqPtr.x;aqPtr.py=aqPtr.y;aqPtr.x=x;aqPtr.y=y;aqPtr.t=performance.now();if(cleaning&&aqPtr.down)wipe(x,y);
+  if(toyDrag){const o=toyDrag.o,r=TOYDEF[o.id].r;toyDrag.moved+=Math.hypot(x-aqPtr.px,y-aqPtr.py);o.x=Math.max(AB.x0+r,Math.min(AB.x1-r,x));o.y=Math.max(AB.y0-2,Math.min(SANDY()-3,y));
+    toyDrag.hist.push([performance.now(),x,y]);if(toyDrag.hist.length>6)toyDrag.hist.shift()}});
+["pointerup","pointerleave","pointercancel"].forEach(ev=>$("#tankc").addEventListener(ev,()=>{endToyDrag();if(aqPtr.down&&cleaning){save();tipsUpdate()}aqPtr.down=false}));
 $("#tankc").addEventListener("pointerdown",e=>{
   const[mx,my]=cpos(e);aqPtr.down=true;aqPtr.px=aqPtr.x=mx;aqPtr.py=aqPtr.y=my;aqPtr.t=performance.now();
   if(cleaning)return;
+  const ht=Object.values(TOY).reverse().find(o=>Math.hypot(mx-o.x,my-o.y)<=TOYDEF[o.id].r+5);
+  if(ht){toyDrag={o:ht,t:performance.now(),moved:0,hist:[[performance.now(),mx,my]]};ht.drag=true;ht.vx=ht.vy=0;aqSel=null;tagContent();return}
   let best=null,bd=1e9;
   AQ.forEach(a=>{const dx=Math.abs(mx-a.x),dy=Math.abs(my-a.y);if(dx<=a.sp.W/2+4&&dy<=a.sp.Ht/2+4){const d=dx*dx+dy*dy;if(d<bd){bd=d;best=a}}});
   aqSel=best;
-  if(best){best.pause=3.5;aqSelT=4;best.spin=.6;bubble(best.x,best.y-3);play("boop");for(let i=0;i<3;i++)SPK.push({x:best.x+(R()-.5)*best.sp.W,y:best.y-best.sp.Ht/2-R()*5,l:.9,h:340})}
+  if(best){best.pause=3.5;aqSelT=4;best.spin=.75;bubble(best.x,best.y-3);play("boop");for(let i=0;i<3;i++)SPK.push({x:best.x+(R()-.5)*best.sp.W,y:best.y-best.sp.Ht/2-R()*5,l:.9,h:340})}
   else{const t=performance.now();
     if(t-aqTap.t<380&&Math.hypot(mx-aqTap.x,my-aqTap.y)<30){   // double tap = knock on the glass: everyone darts away
       play("knock");ripple(mx,my);AQ.forEach(a=>{const ox=a.x-mx,oy=a.y-my,od=Math.hypot(ox,oy)||1;a.vx=ox/od*70;a.vy=oy/od*45;a.scare=.9;a.pause=0})}
@@ -952,7 +1042,14 @@ const DECOR={
  anchor:{n:"Old anchor",cost:600,pts:4,x:92,e:"⚓"},statue:{n:"Stone fish statue",cost:4500,pts:9,x:114,e:"🗿"},bubbler:{n:"Bubble stone",cost:900,pts:5,x:136,e:"🫧"},
  wreck:{n:"Shipwreck",cost:9000,pts:14,x:164,e:"🚢"},chest:{n:"Treasure chest",cost:1500,pts:6,x:198,e:"🧰"},lamp:{n:"Glow lamp",cost:3000,pts:8,x:220,e:"💡"},
  diverfig:{n:"Tiny diver",cost:2500,pts:6,x:240,e:"🤿"},castle:{n:"Sunken castle",cost:6000,pts:10,x:268,e:"🏰"},sub:{n:"Toy submarine",cost:7000,pts:12,x:0,e:"🚤"},
- jelly:{n:"Moon jellies",pearls:70,pts:12,x:0,e:"🪼"},goldshell:{n:"Golden pearl shell",pearls:120,pts:16,x:290,e:"🐚"}};
+ jelly:{n:"Moon jellies",pearls:70,pts:12,x:0,e:"🪼"},goldshell:{n:"Golden pearl shell",pearls:120,pts:16,x:290,e:"🐚"},
+ snail:{n:"Helper snail",cost:2500,pts:4,x:0,e:"🐌",tip:"Eats moss: the glass gets dirty 45% slower"},
+ duck:{n:"Rubber duck",cost:800,pts:5,x:0,e:"🦆",tip:"Floats on top. Tap it, drag it, flick it",toy:1},
+ ball:{n:"Bouncy beach ball",cost:1200,pts:6,x:0,e:"🏐",tip:"Tap to bounce, flick to throw. Fish like to nudge it",toy:1},
+ crab:{n:"Scuttle crab",cost:1800,pts:6,x:0,e:"🦀",tip:"Walks along the sand. Tap to make it dance",toy:1},
+ hoop:{n:"Swim-through hoop",cost:2200,pts:7,x:0,e:"⭕",tip:"Drag it anywhere. Fish swim through it for fun",toy:1},
+ musicbox:{n:"Music box",cost:2800,pts:7,x:0,e:"🎵",tip:"Tap to play a tune. Fish come to dance",toy:1},
+ orb:{n:"Glow orb",cost:3500,pts:9,x:0,e:"🔮",tip:"A floating light. Drag it, fish gather around it",toy:1}};
 const FPT=[1,1,2,2,4,7,12,20,100],HRS=3600000;
 let par=[];
 const tk=()=>S.tanks[S.tk];
@@ -961,15 +1058,17 @@ const hm=ms=>{const h=Math.floor(ms/HRS),m=Math.max(1,Math.ceil(ms%HRS/60000));r
 function appeal(t){const sp=new Set(),st=new Set();let a=0;
   t.fish.forEach(f=>{const q=fi(f.id);a+=FPT[q.a]+(q.m===homeOf(t)?2:0)+(f.hy?2:0)+(f.pet?1:0)+(f.w0?Math.floor((f.w/f.w0-1)*10):0);sp.add(q.s);st.add(q.m)});
   return a+sp.size+st.size+t.decor.reduce((x,id)=>x+DECOR[id].pts,0)}
-const dirtNow=t=>Math.min(100,(t.dirt||0)+(Date.now()-(t.dt||Date.now()))/(36*HRS)*100);
+const dirtRate=t=>(3+1.8*t.fish.length)*(t.decor.includes("snail")?.55:1);   // percent per hour: more fish = more mess
+const dirtNow=t=>Math.min(100,(t.dirt||0)+Math.max(0,Date.now()-(t.dt||Date.now()))/HRS*dirtRate(t));
 function setDirt(t,v){t.dirt=Math.max(0,Math.min(100,v));t.dt=Date.now()}
-const tipRate=t=>Math.round(appeal(t)*10*(1.1-dirtNow(t)/200));   // a clean glass earns more, a mossy one less
+const settle=t=>setDirt(t,dirtNow(t));   // lock in the mess so far before something changes how fast it grows
+const tipRate=t=>Math.round(appeal(t)*10*(1.1-dirtNow(t)/160));   // a clean glass earns more, a mossy one less
 const tipsPending=t=>Math.floor(Math.min(8*HRS,Date.now()-t.t)/HRS*tipRate(t));
 function tipsUpdate(){const t=tk();if(!t)return;const dn=Math.round(dirtNow(t)),eg=t.eggs[0];
-  $("#tankStats").innerHTML=`<b>Appeal ${appeal(t)}</b> · visitors tip about <b>${tipRate(t).toLocaleString()} shunk an hour</b>. Waiting now: <b>${tipsPending(t).toLocaleString()} shunk</b> <span class="muted">(fills for up to 8 hours)</span><br><span class="muted">Home strain: ${MARKS[homeOf(t)]} (+2 appeal each). Glass: ${dn<10?"sparkling":dn<40?"a little dusty":dn<70?"mossy":"very mossy"}${dn>=40?", tips are lower":""}.</span>`;
+  $("#tankStats").innerHTML=`<b>Appeal ${appeal(t)}</b> · visitors tip about <b>${tipRate(t).toLocaleString()} shunk an hour</b>. Waiting now: <b>${tipsPending(t).toLocaleString()} shunk</b> <span class="muted">(fills for up to 8 hours)</span><br><span class="muted">Home strain: ${MARKS[homeOf(t)]} (+2 appeal each). Glass: ${dn<10?"sparkling":dn<40?"a little dusty":dn<70?"mossy":"very mossy"} (${dn}%).${t.play?" Fish have played with toys "+t.play+" times.":""} More fish and feeding make more mess${dn>=40?"; tips are lower, so wipe it clean":""}${dn>60?", and fish grow slower":""}.</span>`;
   $("#collect").disabled=tipsPending(t)<1;if(eg&&Date.now()>=eg.ready&&!eg.n){eg.n=1;toast("An egg is ready to hatch!");play("pearl");save()}}
-function growFish(f,m){m=m||1;if(!f.w0){f.w0=f.w;f.p0=f.p}f.w=+Math.min(f.w0*1.6,f.w+f.w0*.025*m).toFixed(2);f.p=Math.max(1,Math.round(f.p0*f.w/f.w0));if(m===1){f.ate=(f.ate||0)+1;if(f.ate>=3){f.ate=0;f.full=Date.now()+20*60000}}}
-function eatPellet(a,p){growFish(a.f,p&&p.gold?3:1);a.sp=spriteFor(a.f);a.L=a.sp.L;a.spin=.6;play("nom");for(let i=0;i<3;i++)SPK.push({x:a.x+(R()-.5)*a.sp.W,y:a.y-a.sp.Ht/2-R()*4,l:.8,h:340});save()}
+function growFish(f,m){m=m||1;const g=m*(dirtNow(tk())>60?.5:1);if(!f.w0){f.w0=f.w;f.p0=f.p}f.w=+Math.min(f.w0*1.6,f.w+f.w0*.025*g).toFixed(2);f.p=Math.max(1,Math.round(f.p0*f.w/f.w0));if(m===1){f.ate=(f.ate||0)+1;if(f.ate>=3){f.ate=0;f.full=Date.now()+20*60000}}}
+function eatPellet(a,p){growFish(a.f,p&&p.gold?3:1);a.sp=spriteFor(a.f);a.L=a.sp.L;a.munch=.3;play("nom");for(let i=0;i<3;i++)SPK.push({x:a.x+(R()-.5)*a.sp.W,y:a.y-a.sp.Ht/2-R()*4,l:.8,h:340});save()}
 function chestOpen(){return(performance.now()/1000)%7<1.6}
 function drawScenery(x){
   const B=AB.y1+4,t=performance.now()/1000,T=tk(),dark=!lightsOn();
@@ -989,12 +1088,16 @@ function drawScenery(x){
       x.fillStyle="#3a2e1c";x.fillRect(cx-14,B-22,3,5);x.fillRect(cx+12,B-24,3,5);x.fillRect(cx-3,B-9,7,9);x.fillStyle="#d0392e";x.fillRect(cx+13,B-38,1,5);x.fillRect(cx+14,B-38,5,3)}
     if(id==="goldshell"){x.fillStyle="#d9a830";x.fillRect(cx-8,B-9,17,9);x.fillStyle="#f2c94c";for(let k=-3;k<=3;k++)x.fillRect(cx+k*2,B-13+Math.abs(k),2,12-Math.abs(k));x.fillStyle="#a8791c";x.fillRect(cx-9,B-2,19,2)}
   });
-  if(T.decor.includes("sub")){const p=subPos();x.fillStyle="#f2c230";x.fillRect(p.x-12,p.y-4,24,8);x.fillRect(p.x-8,p.y-7,10,4);x.fillStyle="#9ad7ff";x.fillRect(p.x-3,p.y-3,3,3);x.fillRect(p.x+3,p.y-3,3,3);x.fillStyle="#c9402e";x.fillRect(p.x-14,p.y-2,2,4);x.fillStyle="#6a7a86";x.fillRect(p.x-1,p.y-9,1,3)}
+  if(T.decor.includes("sub")){const p=subPos();x.save();x.translate(Math.round(p.x),Math.round(p.y));x.scale(p.dir,1);
+    x.fillStyle="#f2c230";x.fillRect(-12,-4,24,8);x.fillRect(-8,-7,10,4);x.fillStyle="#9ad7ff";x.fillRect(-3,-3,3,3);x.fillRect(3,-3,3,3);x.fillStyle="#c9402e";x.fillRect(-14,-2,2,4);x.fillStyle="#6a7a86";x.fillRect(-1,-9,1,3);x.restore()}
+  drawToys(x);
+  if(T.decor.includes("snail")){const w=AB.x1-AB.x0-30,u=(t*2.2)%(2*w),sx=AB.x0+14+(u<w?u:2*w-u),d=u<w?1:-1;x.save();x.translate(Math.round(sx),AB.y1+10);x.scale(d,1);x.fillStyle="#9a8a6a";x.fillRect(-4,0,9,2);x.fillStyle="#7a4a2a";x.fillRect(-3,-4,5,5);x.fillStyle="#a8683a";x.fillRect(-2,-3,3,3);x.fillStyle="#9a8a6a";x.fillRect(4,-3,1,3);x.fillRect(6,-3,1,3);x.restore()}
   if(dark){x.fillStyle="rgba(4,8,30,.3)";x.fillRect(0,0,AW,AH)}
   x.globalCompositeOperation="lighter";   // lights and glowing things shine on top of the dark
   if(T.decor.includes("lamp")){const cx=DECOR.lamp.x,g=x.createRadialGradient(cx,B-28,2,cx,B-28,dark?44:30),a=(dark?.7:.34)+.08*Math.sin(t*2);g.addColorStop(0,`rgba(255,210,100,${a})`);g.addColorStop(1,"rgba(255,210,100,0)");x.fillStyle=g;x.fillRect(cx-46,B-76,92,92)}
-  if(T.decor.includes("jelly")){for(let k=0;k<2;k++){const jx=60+Math.sin(t*.25+k*2)*80+k*110,jy=72+Math.sin(t*.6+k)*18,g=x.createRadialGradient(jx,jy,1,jx,jy,16);g.addColorStop(0,"rgba(190,170,255,.45)");g.addColorStop(1,"rgba(190,170,255,0)");x.fillStyle=g;x.fillRect(jx-16,jy-16,32,32);
+  if(T.decor.includes("jelly")){for(let k=0;k<2;k++){const jp=jellyAt(k,t),jx=jp.x,jy=jp.y,g=x.createRadialGradient(jx,jy,1,jx,jy,16);g.addColorStop(0,"rgba(190,170,255,.45)");g.addColorStop(1,"rgba(190,170,255,0)");x.fillStyle=g;x.fillRect(jx-16,jy-16,32,32);
     x.fillStyle="rgba(215,200,255,.8)";x.fillRect(jx-5,jy-4,10,4);x.fillRect(jx-4,jy-6,8,2);x.fillStyle="rgba(235,225,255,.6)";for(let i=0;i<4;i++)x.fillRect(jx-4+i*3,jy,1,6+Math.sin(t*3+i+k)*2)}}
+  drawToyGlow(x,dark);
   if(T.decor.includes("goldshell")){const cx=DECOR.goldshell.x,a=.5+.3*Math.sin(t*3),g=x.createRadialGradient(cx,B-6,1,cx,B-6,10);g.addColorStop(0,`rgba(255,250,220,${a})`);g.addColorStop(1,"rgba(255,250,220,0)");x.fillStyle=g;x.fillRect(cx-10,B-16,20,20)}
   x.globalCompositeOperation="source-over";
   if(T.eggs.length){const e=T.eggs[0],ready=Date.now()>=e.ready,px=160,py=B-4;x.fillStyle=ready?"#fff1b0":"#d9d2b0";x.fillRect(px-3,py-6,7,8);x.fillRect(px-2,py-8,5,2);x.fillStyle="#a89a70";x.fillRect(px-1,py-3,1,1);x.fillRect(px+2,py-5,1,1);
@@ -1006,7 +1109,7 @@ function startBreed(){
   if(!a||!b)return;if(!canBreed(a)||!canBreed(b))return toast("A parent is still resting.");if(t.eggs.length)return toast("This tank already has an egg.");
   const c=150+100*(fi(a.id).a+fi(b.id).a);if(S.shunk<c)return toast("Breeding costs "+c.toLocaleString()+" shunk.");
   S.shunk-=c;const qa=fi(a.id),qb=fi(b.id),pk=(x,y)=>Math.random()<.5?x:y,mut=Math.random()<.2;
-  let v=pk(qa.v,qb.v);if(mut)v=Math.min(7,(v/10|0)+1)*10+Math.floor(Math.random()*10);
+  let v=pk(qa.v,qb.v);if(mut)v=Math.min(7,(v/TV|0)+1)*TV+Math.floor(Math.random()*TV);
   const s=Math.random()<.05?Math.floor(Math.random()*NSP):pk(qa.s,qb.s),m=Math.random()<.1?Math.floor(Math.random()*8):pk(qa.m,qb.m);
   const w=Math.max(.02,+((a.w+b.w)/2*(.85+Math.random()*.5)*(mut?1.15:1)).toFixed(2));
   t.eggs.push({ready:Date.now()+4*HRS,id:(v*NSP+s)*NM+m,w,mut});a.rest=b.rest=Date.now()+12*HRS;par=[];play("coin");save();render();toast("An egg is incubating. It hatches in 4 hours.")}
@@ -1020,7 +1123,7 @@ $("#collect").onclick=()=>{const t=tk(),n=tipsPending(t);if(n<1)return;S.shunk+=
 function feedNow(gold){const key=gold?"sfood":"food";
   if(!S.aq.length)return toast("Put a fish in the tank first.");if(!(S.items[key]>0))return toast("No "+(gold?"super":"fish")+" food. Buy some in the Shop"+(gold?" or with pearls.":", or earn it from orders."));
   if(!gold&&S.aq.every(f=>(f.full||0)>Date.now()))return toast("Everyone is full. Try again later, or use super food.");
-  S.items[key]--;for(let i=0;i<8;i++){PEL.push({x:AB.x0+20+R()*(AB.x1-AB.x0-40),y:AB.y0+2-R()*10,vy:12+R()*8,life:9,gold});setTimeout(()=>play("plip"),i*90)}save();render()}
+  S.items[key]--;setDirt(tk(),dirtNow(tk())+(gold?6:4));for(let i=0;i<8;i++){PEL.push({x:AB.x0+20+R()*(AB.x1-AB.x0-40),y:AB.y0+2-R()*10,vy:12+R()*8,life:9,gold});setTimeout(()=>play("plip"),i*90)}save();render()}
 $("#feed").onclick=()=>feedNow(false);$("#feed2").onclick=()=>feedNow(true);
 $("#lights").onclick=()=>{S.lights=S.lights==null?true:S.lights===true?false:null;play("tick");save();render()};
 $("#clean").onclick=()=>{cleaning=!cleaning;$("#tankc").classList.toggle("clean",cleaning);aqSel=null;tagContent();play("tick");if(cleaning)toast("Swipe across the glass to wipe away the moss.");render()};
@@ -1037,7 +1140,7 @@ function aquaRender(){
     <p style="margin:0 0 8px">${a&&b?`<b>${esc(nameOf(a))}</b> + <b>${esc(nameOf(b))}</b><br><span class="muted">Costs ${(150+100*(fi(a.id).a+fi(b.id).a)).toLocaleString()} shunk. Hatches in 4 hours. Parents rest for 12 hours.</span>`:'<span class="muted">No parents chosen yet.</span>'}</p>
     <button data-breed="1" ${a&&b&&!eg?"":"disabled"}>Start breeding</button>
     ${eg?`<p style="margin:10px 0 6px"><b>🥚 An egg is incubating.</b> ${Date.now()>=eg.ready?"It is ready!":"Ready in "+hm(eg.ready-Date.now())+"."}</p><button data-hatch="1" ${Date.now()>=eg.ready?"":"disabled"}>Hatch the egg</button>`:""}`;
-  $("#decorList").innerHTML=Object.keys(DECOR).map(id=>{const D=DECOR[id],own=t.decor.includes(id),can=D.pearls?(S.pearls||0)>=D.pearls:S.shunk>=D.cost;return `<div class="row"><span style="font-size:24px">${D.e}</span><span class="n"><b>${D.n}</b><br><span class="muted">+${D.pts} appeal${D.pearls?", pearls only":""}</span></span>${own?'<span class="tag" style="background:#3f9a2c">In tank</span>':`<button data-deco="${id}" ${can?"":"disabled"}>${D.pearls?"🦪 "+D.pearls:"Buy · "+D.cost.toLocaleString()}</button>`}</div>`}).join("");
+  $("#decorList").innerHTML=Object.keys(DECOR).map(id=>{const D=DECOR[id],own=t.decor.includes(id),can=D.pearls?(S.pearls||0)>=D.pearls:S.shunk>=D.cost;return `<div class="row"><span style="font-size:24px">${D.e}</span><span class="n"><b>${D.n}</b><br><span class="muted">+${D.pts} appeal${D.pearls?", pearls only":""}${D.tip?"<br>"+D.tip:""}</span></span>${own?'<span class="tag" style="background:#3f9a2c">In tank</span>':`<button data-deco="${id}" ${can?"":"disabled"}>${D.pearls?"🦪 "+D.pearls:"Buy · "+D.cost.toLocaleString()}</button>`}</div>`}).join("");
   $("#aqBag").innerHTML=S.bag.length?S.bag.map((f,i)=>`<div class="row"><span style="font-size:24px">${fem(f.id)}</span><span class="n">${esc(fname(f.id))}${hyTag(f)}<br><span class="muted">${f.w} kg</span></span><button data-aqadd="${i}" ${S.aq.length>=5?"disabled":""}>Put in tank</button></div>`).join(""):'<p class="muted">Your bag is empty.</p>';
   $("#feed").textContent="Feed fish ("+(S.items.food||0)+")";tipsUpdate();aquaSync();
 }
